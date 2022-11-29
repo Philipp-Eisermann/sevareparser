@@ -1,0 +1,1 @@
+- Parameter: directory name of a run outputted by sevare bench (https://github.com/vyrovcz/sevarebench)
