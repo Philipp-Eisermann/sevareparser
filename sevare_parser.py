@@ -14,6 +14,7 @@ import numpy as np
 # if the protocol was run multiple times for same parameter values in the same run
 # - For 3D plots:
 
+
 def get_sorting(row):
     return row[sorting_index]
 
@@ -25,6 +26,7 @@ def interpolate_file(file_, degree):
     y = []
     # fill up x and y
     d = file_.readlines()
+    #print(d)
     for lin in range(len(d)):
         dd = d[lin].split('\t')
         x.append(float(dd[0]))
@@ -36,7 +38,7 @@ def interpolate_file(file_, degree):
 
 # Input: protocol, String
 # Output: Integer (-1 -> did not find protocol, 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon)
-def get_security_class(protocol):
+def get_security_class(prot):
     protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
     protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
     protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
@@ -45,14 +47,25 @@ def get_security_class(protocol):
                           "mal-shamir-bmr", "mal-rep-bmr"]
     protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
                           "replicated-bin", "ccd"]
-    if protocol in protocols_mal_dis:
+    if prot in protocols_mal_dis:
         return 0
-    if protocol in protocols_mal_hon:
+    if prot in protocols_mal_hon:
         return 1
-    if protocol in protocols_semi_dis:
+    if prot in protocols_semi_dis:
         return 2
-    if protocol in protocols_semi_hon:
+    if prot in protocols_semi_hon:
         return 3
+
+
+def get_security_class_name(class_nb):
+    if class_nb == 0:
+        return "Malicious, Dishonest Majority"
+    if class_nb == 1:
+        return "Malicious, Honest Majority"
+    if class_nb == 2:
+        return "Semi-Honest, Dishonest Majority"
+    if class_nb == 3:
+        return "Semi-Honest, Honest Majority"
 
 
 # ----- ARGUMENTS --------
@@ -136,7 +149,7 @@ for i in range(len(index_array)):
     if index_array[i] == -1:
         continue
 
-    print(str(i) + " Iteration")
+    # print(str(i) + " Iteration")
     # If table only contains one protocol
     protocol = None
 
@@ -160,7 +173,7 @@ for i in range(len(index_array)):
                     var_val_array[j] = line[index_array[j]]
                 else:
                     var_val_array[j] = None # may be inefficient
-            print(protocol + str(var_name_array[i]) + str(var_val_array))
+            # print(protocol + str(var_name_array[i]) + str(var_val_array))
 
         # Only parse line when it shows the initial values of controlled variables
         if all((var_val_array[j] is None or var_val_array[j] == line[index_array[j]]) for j in range(len(index_array))):
@@ -202,7 +215,7 @@ for combo in plot3D_var_combo:
             # Fill up var_val array with initial values of other configured variables - have to be fixed for a combo (controlled variables)
             for i in range(len(index_array)):
                 if (index_array[i] != -1) and (var_name_array[i] != combo[0]) and (var_name_array[i] != combo[1]):
-                    print(var_name_array[i] + " and x[0] = " + combo[0] + " and x[1] = " + combo[1])
+                    # print(var_name_array[i] + " and x[0] = " + combo[0] + " and x[1] = " + combo[1])
                     var_val_array[i] = line[index_array[i]]
                 else:
                     var_val_array[i] = None # may be inefficient
@@ -214,25 +227,30 @@ for combo in plot3D_var_combo:
             datafile3D.write(line[index_array[index_0]] + '\t' + line[index_array[index_1]] + '\t' + line[runtime_index] + '\n')
 
 
-'''
-# ----  INTERPOLATION & WINNER SEARCH -------
-# Each array contains winners for each changing variable (<name>,lowest coefficient)
-# One array for each security class
+# ----  INTERPOLATION & WINNER SEARCH for 2D experiments -------
+# winners is a two dimensional array
+# The first dimension gives the security class: 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon
+# The second dimension gives the variable (indexes analog to var_name_array) for which the winner is stored
+# Each element is a tuple: (<protocol_name>, best coefficient)
 
-winners_mal_dis = [("", 0)] * len(variable_array)
-winners_mal_hon = [("", 0)] * len(variable_array)
-winners_semi_dis = [("", 0)] * len(variable_array)
-winners_semi_hon = [("", 0)] * len(variable_array)
+winners = [None] * 4  # [[["", sys.maxsize]] * len(variable_array)] * 4
+for i in range(4):
+    winners[i] = [None] * len(variable_array)
+    for j in range(len(variable_array)):
+        winners[i][j] = ["", sys.maxsize]
+print(winners)
 
 # Get all generated 2D plot files - only files (not directories) were generated in this path
 plots2D = os.listdir(filename + "parsed/2D/")
-print(plots2D)
+# print(plots2D)
 
 # Get generated files
 for i in range(len(plots2D)):
     plot = open(filename + "parsed/2D/" + plots2D[i], "r")
+    plot_type = plots2D[i][0:4]  # String
+    protocol = plots2D[i][4:(len(plots2D[i])-4)]  # Reparse protocol name from file name - may be optimisable
     # print(plots2D[i])
-    if plots2D[i][0:4] == "Lat_":
+    if plot_type == "Lat_":
         f = interpolate_file(plot, 1)
         # var_name index of Lat_ is 0, use var_name_array.index(plots2D[i][0:4]) if changed
 
@@ -240,18 +258,43 @@ for i in range(len(plots2D)):
             plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
     else:
         f = interpolate_file(plot, 2)
-        index = var_name_array.index(plots2D[i][0:4])
         info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
     # for j in range(2):  # range has to be degree given in prior line
     #   info_file_2D.write(" " + str(f[j]) + " * x**" + str(j) + " ")
 
-# Find winner
+    print(protocol)
+    first_index = get_security_class(protocol)
+    second_index = var_name_array.index(plot_type)  # Int
+
+    # Check if better - fill up the winners array
+    if plot_type == "Bdw_":
+        if winners[first_index][second_index][1] < f[0]:
+            winners[first_index][second_index][0] = protocol
+            winners[first_index][second_index][1] = f[0]
+    else:
+        if winners[first_index][second_index][1] > f[0]:
+            winners[first_index][second_index][0] = protocol
+            winners[first_index][second_index][1] = f[0]
+
+    print(winners[0])
+    print(winners[1])
+    print(winners[2])
+    print(winners[3])
+
+# Write all winners in table
+info_file_2D.write("\n\n\nProtocol Winners:\n\n")
+# Go through security class
+for i in range(3):
+    info_file_2D.write(get_security_class_name(i) + " protocols:\n")
+    for j in range(len(winners[i])):
+        if winners[i][j][0] == "":
+            continue
+        info_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
 
 # Parse summary file
 # Get set size from database
 
 
-'''
 
 
