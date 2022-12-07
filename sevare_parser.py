@@ -2,6 +2,7 @@ import sys
 import argparse
 import os
 import numpy as np
+from scipy.optimize import curve_fit
 
 # SEVARE PARSER 2.0 - adapted to new table forms
 # Format of short datatable:
@@ -19,21 +20,60 @@ def get_sorting(row):
     return row[sorting_index]
 
 
-# This function will write the interpolation function at the end of each file contained in file_array
-# is_linear indicates if all files should be interpolated linearly or not (true=linear interpolation)
-def interpolate_file(file_, degree):
+def read_file(file_):
     x = []
     y = []
+    d = None
     # fill up x and y
     d = file_.readlines()
-    #print(d)
+    # print(d)
     for lin in range(len(d)):
         dd = d[lin].split('\t')
         x.append(float(dd[0]))
-        y.append(float(dd[1][0:len(dd[1])-1]))
+        y.append(float(dd[1][0:len(dd[1]) - 1]))
+    return x, y
+
+
+# This function will write the interpolation function at the end of each file contained in file_array
+# is_linear indicates if all files should be interpolated linearly or not (true=linear interpolation)
+def interpolate_file(file_, degree):
+    x, y = read_file(file_)
     if x == [] or y == []:
         return [0, 0]
+
+    if len(x) < 5:
+        return [-1, -1]
+
     return np.polyfit(x, y, degree)
+
+
+def interpolate_exponential(file_):
+    x, y = read_file(file_)
+    if x == [] or y == []:
+        return [0, 0]
+
+    print(x[0])
+    print(y[0])
+
+    if len(x) < 5:
+        return [-1, -1]
+
+    popt, pcov = curve_fit(lambda t, a, b, c: a * np.exp(b * t) + c, x, y)
+    return popt
+
+
+def interpolate_inverse(file_):
+    x, y = read_file(file_)
+    if x == [] or y == []:
+        return [0, 0]
+
+    if len(x) < 5:
+        return [-1, -1]
+
+    # popt, pcov = curve_fit(lambda t, a, b, c: a * np.exp(b * t) + c, x.reverse(), y)
+    popt, pcov = curve_fit(lambda t, a, b: a/t + b, x, y)
+    # popt, pcov = curve_fit(lambda t, a, b, c: a*t**2 + b*t + c, x, y)
+    return popt
 
 
 # Input: protocol, String
@@ -142,7 +182,7 @@ dataset_array = []
 for li in dataset:
     dataset_array.append(li.split(';'))
 
-# - - - - - - - 2D Plotting - - - - - - - -
+# - - - - - - - Parsing for 2D plots - - - - - - - -
 # Go through dataset for each variable
 for i in range(len(index_array)):
     # Only parse for variables that are measured in the table
@@ -172,7 +212,7 @@ for i in range(len(index_array)):
                 if index_array[j] != -1 and i != j:
                     var_val_array[j] = line[index_array[j]]
                 else:
-                    var_val_array[j] = None # may be inefficient
+                    var_val_array[j] = None  # may be inefficient
             # print(protocol + str(var_name_array[i]) + str(var_val_array))
 
         # Only parse line when it shows the initial values of controlled variables
@@ -180,6 +220,7 @@ for i in range(len(index_array)):
             datafile2D.write(line[index_array[i]] + '\t' + line[runtime_index] + '\n')
             # TODO: Check if additional file with y=
 
+datafile2D.close()
 # - - - - - - 3D PLOTTING - - - - - - -
 var_val_array = [None] * len(variable_array)  # reset vars
 plot3D_var_combo = [("Set_", "Lat_"), ("Set_", "Bdw_"), ("Lat_", "Frq_"), ("Bdw_", "Frq_"), ("Lat_", "Bdw_"), ("Lat_", "Pdr_"), ("Bdw_", "Pdr_")]
@@ -233,68 +274,87 @@ for combo in plot3D_var_combo:
 # The second dimension gives the variable (indexes analog to var_name_array) for which the winner is stored
 # Each element is a tuple: (<protocol_name>, best coefficient)
 
-winners = [None] * 4  # [[["", sys.maxsize]] * len(variable_array)] * 4
+winners = [None] * 4
 for i in range(4):
     winners[i] = [None] * len(variable_array)
     for j in range(len(variable_array)):
         winners[i][j] = ["", sys.maxsize]
-print(winners)
+# print(winners)
 
 # Get all generated 2D plot files - only files (not directories) were generated in this path
 plots2D = os.listdir(filename + "parsed/2D/")
 # print(plots2D)
 
-# Get generated files
+# Interolate generated files
 for i in range(len(plots2D)):
     plot = open(filename + "parsed/2D/" + plots2D[i], "r")
     plot_type = plots2D[i][0:4]  # String
     protocol = plots2D[i][4:(len(plots2D[i])-4)]  # Reparse protocol name from file name - may be optimisable
+    print(protocol)
     # print(plots2D[i])
     if plot_type == "Lat_":
         f = interpolate_file(plot, 1)
         # var_name index of Lat_ is 0, use var_name_array.index(plots2D[i][0:4]) if changed
-
         info_file_2D.write(
             plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
+
+    elif plot_type == "Pdr_":
+        # f has the form a*e^(b*x) + c
+        f = interpolate_exponential(plot)
+        if f == [-1, -1]:
+            info_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            continue
+        else:
+            info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n")
+
+    elif plot_type == "Bdw_":
+        # f has the form a/x + b
+        f = interpolate_inverse(plot)
+        if f[0] == -1:
+            info_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            continue
+        else:
+            if f[0] < 0:
+                info_file_2D.write(plots2D[i] + " -> error: preprocessing phase")  # See remark in README.md
+                continue
+            info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
+
+    elif plot_type == "Set_":
+        print("Not plotting for set for now")
+        continue
+
     else:
         f = interpolate_file(plot, 2)
-        info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
+        if f == [-1, -1]:
+            info_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+        else:
+            info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
     # for j in range(2):  # range has to be degree given in prior line
     #   info_file_2D.write(" " + str(f[j]) + " * x**" + str(j) + " ")
 
-    print(protocol)
     first_index = get_security_class(protocol)
     second_index = var_name_array.index(plot_type)  # Int
 
-    # Check if better - fill up the winners array
-    if plot_type == "Bdw_":
-        if winners[first_index][second_index][1] < f[0]:
-            winners[first_index][second_index][0] = protocol
-            winners[first_index][second_index][1] = f[0]
-    else:
-        if winners[first_index][second_index][1] > f[0]:
-            winners[first_index][second_index][0] = protocol
-            winners[first_index][second_index][1] = f[0]
+    # For each variable, a lower first coefficient means a runtime function that indicates a more effective protocol
+    if winners[first_index][second_index][1] > f[0]:
+        winners[first_index][second_index][0] = protocol
+        winners[first_index][second_index][1] = f[0]
 
-    print(winners[0])
-    print(winners[1])
-    print(winners[2])
-    print(winners[3])
+    #print(winners[0])
+    #print(winners[1])
+    #print(winners[2])
+    #print(winners[3])
 
 # Write all winners in table
 info_file_2D.write("\n\n\nProtocol Winners:\n\n")
 # Go through security class
-for i in range(3):
+for i in range(4):
     info_file_2D.write(get_security_class_name(i) + " protocols:\n")
     for j in range(len(winners[i])):
         if winners[i][j][0] == "":
             continue
         info_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
-
 # Parse summary file
 # Get set size from database
-
-
-
 
