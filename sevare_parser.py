@@ -112,7 +112,7 @@ def get_security_class_name(class_nb):
 parser = argparse.ArgumentParser(
     description='This program parses the measurement folder outputted by sevare-bench (version from 11/22).')
 
-parser.add_argument('filename', type=str, help='Required, name of the folder (normally a date).')
+parser.add_argument('filename', type=str, help='Required, name of the test-run folder (normally a date).')
 
 parser.add_argument('-s', type=str, required=False,
                     help='(Optional) When set the table will be sorted by this parameter beforehand.')
