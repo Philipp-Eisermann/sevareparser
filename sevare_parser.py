@@ -20,6 +20,7 @@ def get_sorting(row):
     return row[sorting_index]
 
 
+# Reads 2D data file and returns the x and y datapoints in arrays
 def read_file(file_):
     x = []
     y = []

@@ -1,106 +1,169 @@
+import argparse
+import os
+import matplotlib.pyplot as plt
+
+
 # SEVARE PLOTTER
 # Will create a /plotted directory and write everything in there
 # A folder is created for each variable combination type ("<var_name>*_) contained in /parsed
 # In these folders a plot (.tex & .pdf) for each security class (if represented by at least 1 protocol) will be created
 
+
+# Reads 2D data file and returns the x and y datapoints in arrays
+def read_file(file_):
+    x = []
+    y = []
+    d = None
+    # fill up x and y
+    d = file_.readlines()
+    # print(d)
+    for lin in range(len(d)):
+        dd = d[lin].split('\t')
+        x.append(float(dd[0]))
+        y.append(float(dd[1][0:len(dd[1]) - 1]))
+    return x, y
+
+
+# Input: protocol, String
+# Output: Integer (-1 -> did not find protocol, 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon)
+def get_security_class(prot):
+    protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
+    protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
+    protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
+                          "brain", "malicious-rep-ring",
+                          "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin", "malicious-ccd", "ps-rep-bin",
+                          "mal-shamir-bmr", "mal-rep-bmr"]
+    protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
+                          "replicated-bin", "ccd"]
+    if prot in protocols_mal_dis:
+        return 0
+    if prot in protocols_mal_hon:
+        return 1
+    if prot in protocols_semi_dis:
+        return 2
+    if prot in protocols_semi_hon:
+        return 3
+
+
+def get_security_class_name(class_nb):
+    if class_nb == 0:
+        return "Malicious, Dishonest Majority"
+    if class_nb == 1:
+        return "Malicious, Honest Majority"
+    if class_nb == 2:
+        return "Semi-Honest, Dishonest Majority"
+    if class_nb == 3:
+        return "Semi-Honest, Honest Majority"
+
+
+# Input: protocol, String
+# Output: Integer (-1 -> did not find protocol, 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon)
+def get_security_class(prot):
+    protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
+    protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
+    protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
+                          "brain", "malicious-rep-ring",
+                          "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin", "malicious-ccd", "ps-rep-bin",
+                          "mal-shamir-bmr", "mal-rep-bmr"]
+    protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
+                          "replicated-bin", "ccd"]
+    if prot in protocols_mal_dis:
+        return 0
+    if prot in protocols_mal_hon:
+        return 1
+    if prot in protocols_semi_dis:
+        return 2
+    if prot in protocols_semi_hon:
+        return 3
+
+    return "error"
+
+
+# Is used to generate the axis labels of plots
+def get_name(prefix_):
+    prefix_names = ["Latency (ms)", "Bandwidths (Mbit/s)", "Packet Loss (%)", "Frequency (GHz)", "Quotas(%)",
+                    "CPU Threads", "Input Size"]  # Axis names
+    prefixes_ = ["Lat_", "Bdw_", "Pdr_", "Frq_", "Quo_", "Cpu_", "Set_"]
+
+    if prefix_ in prefixes_:
+        return prefix_names[prefixes_.index(prefix_)]
+    return prefix_
+
+
+# - - - - - - - - - - ARGUMENTS - - - - - - - - -
+
 parser = argparse.ArgumentParser(
     description='This program plots the results parsed by sevare parser.')
 
-parser.add_argument('filename', type=str, help='Required, name of the test-run folder (usually of the form MONTH-YEAR).')
+parser.add_argument('filename', type=str,
+                    help='Required, name of the test-run folder (usually of the form MONTH-YEAR).')
 
 args = parser.parse_args()
 
 filename = args.filename
 
-if filename[len(args.filename)-1] != '/':
+if filename[len(args.filename) - 1] != '/':
     filename += '/'
 
 colors = ['black', 'blue', 'brown', 'cyan', 'darkgray', 'gray', 'green', 'lightgray', 'lime', 'magenta', 'olive',
           'orange', 'pink', 'purple', 'red', 'teal', 'violet', 'white', 'yellow']
 
-# - - - - - - - - CREATE 2D LATEX FILES - - - - - - - - - - -
+# Create directories
+os.mkdir(filename + "plotted/")
+os.mkdir(filename + "plotted/2D")
 
+# - - - - - - - - CREATE 2D PLOTS - - - - - - - - - - -
 
 data_names = os.listdir(filename + "parsed/2D/")
 
-prefixes = []  # holds all different variable-combinations
-prefix = ""
+prefixes = []  # will contain the variables for 2D plotting
+last = ""
 
+# look at what variables where used in the experiment
 for data in data_names:
-    if prefix != data[0:4]:
-        prefix = data[0:4]
-        prefixes += [prefix]
-        # TODO: create directory
+    # only 2D files, so always 3 char long prefix for variable
+    if last != data[0:4]:
+        last = data[0:4]
+        if last not in prefixes:
+            prefixes += [last]
+            # We want one directory for multiple graphs per variable
+            # Its name should be the prefix without the tailing '_'
+            os.mkdir(filename + "plotted/2D/" + last[:len(last) - 1])
 
-for var_combo in prefixes:
-    files = []  # Holds all files with this variable combination
+# The runtime is in O(n*m) where n is nb of protocols and m nb of variables
+# We need to go through all files for each variable to get all the datafiles for a variable to plot them together
+for prefix in prefixes:
+    # Will hold the filenames organized by security class for the prefix of this iteration
+    protocols = [None] * 4
+    for i in range(4):
+        protocols[i] = []
+
+    # sort in the 4 classes
     for data in data_names:
-        # add protocols
+        if data[:4] == prefix:
+            protocol_name = data[4:(len(data) - 4)]
+            protocols[get_security_class(protocol_name)] += [protocol_name]
+        #print(protocols)
 
-    # go through files array and sort them in the 4 classes
-    for file in files:
+    # create plots
+    for i in range(4):  # for each security class
+        for protocol in protocols[i]:
+            # Fill up info of this security class
+            data_file_reader = open(filename + "parsed/2D/" + prefix + protocol + ".txt", "r")
+            x, y = read_file(data_file_reader)
+            plt.plot(x, y)
 
-    # create latex file for each security class
+        # Create plot for this security class
+        plt.xlabel(get_name(prefix))
+        plt.ylabel("Runtime (s)")  # Datafiles always contain runtime values for the second coordinate
 
+        plt.savefig(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+        plt.clf()
 
-# For 2D, all measurements are put into one file
-if third_column_index == -1:
-    latex_file = open(args.filename + "_plot.tex", "a")
-    # todo: Make sure this file does not exist beforehand
-    latex_file.write("\\documentclass[beamer,multi=true,preview]{standalone}\n\
-\\usepackage{beamerpackages}\n\
-\\usepackage{tumcolor}\n\
-\\newlength{\\upt}\n\
-\\setlength{\\upt}{0.0666667\\beamertextwidth}\n\n\
-\\setbeamertemplate{headline}{}\n\n\
-\\begin{document}%\n\
-\\let\\shipout\\myshipout\n\
-\\begin{standaloneframe}[plain]%\n\
-\\begin{tikzpicture}\n\
-\\begin{axis}[\n")
-    latex_file.write("\ttitle={Experiment on " + "},\n\
-    ylabel={" + args.second_column + "},\n\
-    xlabel={" + args.first_column + "},\n\
-    ymin=0, width=20cm,height=14cm,\n\
-    legend pos={north west}\n\
-    ]\n")
-    for i in range(len(protocols)):
-        latex_file.write(
-            "\\addplot[color=" + colors[i] + "] table {" + DATA_DIRECTORY + "/" + args.filename + "/" + protocols[
-                i] + ".dat};\n")
+    # Cost of security plots
 
-    latex_file.write("\\legend{\n")
-    for prot in protocols:
-        latex_file.write(prot + ',')
-    latex_file.write("}\n\
-\\end{axis}\n\
-\\end{tikzpicture}\n\
-\\end{standaloneframe}\n\
-\\end{document}\n")
+# - - - - - - - - CREATE 3D PLOTS - - - - - - - - - - -
 
-# - - - - - - - - CREATE 3D LATEX FILES - - - - - - - - - - -
+data_names = os.listdir(args.filename + "parsed/3D/")
 
-# TODO: handle "_" in argument - latex does not compile if in title without leading \
-else:
-    for i in range(len(protocols)):
-        latex_file = open(protocols[i] + "_plot.tex", "a")
-
-        latex_file.write("\\documentclass{article}\n\
-\\usepackage[margin=0.5in]{geometry}\n\
-\\usepackage{pgfplots}\n\
-\\pgfplotsset{width=10cm,compat=1.9}\n\
-\\begin{document}\n\
-\\begin{tikzpicture}\n\
-\\begin{axis}[\n")
-        latex_file.write("    xlabel={" + args.first_column + "},\n\
-    ylabel={" + args.second_column + "},\n\
-    zlabel={" + args.t + "}]\n")
-        latex_file.write("\\addplot3[surf] table {" + DATA_DIRECTORY + "/" + protocols[i] + ".dat};\n")
-        latex_file.write("\\end{axis}\n\
-\\end{tikzpicture}\n\
-\\end{document}\n")
-
-latex_file.close()
-
-
-# - - - - - - - - CREATE PDFs FROM TEX FILES - - - - - - - - - - -
+prefixes = []  # variable combinations for 3D plotting
