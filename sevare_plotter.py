@@ -28,11 +28,10 @@ def read_file(file_):
 # Output: Integer (-1 -> did not find protocol, 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon)
 def get_security_class(prot):
     protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
-    protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
-    protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
-                          "brain", "malicious-rep-ring",
-                          "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin", "malicious-ccd", "ps-rep-bin",
-                          "mal-shamir-bmr", "mal-rep-bmr"]
+    protocols_mal_hon = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
+                          "brain", "malicious-rep-ring", "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin",
+                         "malicious-ccd", "ps-rep-bin", "mal-shamir-bmr", "mal-rep-bmr"]
+    protocols_semi_dis = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
     protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
                           "replicated-bin", "ccd"]
     if prot in protocols_mal_dis:
@@ -143,7 +142,6 @@ for prefix in prefixes:
         if data[:4] == prefix:
             protocol_name = data[4:(len(data) - 4)]
             protocols[get_security_class(protocol_name)] += [protocol_name]
-        #print(protocols)
 
     # create plots
     for i in range(4):  # for each security class
@@ -151,16 +149,19 @@ for prefix in prefixes:
             # Fill up info of this security class
             data_file_reader = open(filename + "parsed/2D/" + prefix + protocol + ".txt", "r")
             x, y = read_file(data_file_reader)
-            plt.plot(x, y)
+            plt.plot(x, y, marker='x', label=protocol, linewidth=1.0)
 
         # Create plot for this security class
         plt.xlabel(get_name(prefix))
         plt.ylabel("Runtime (s)")  # Datafiles always contain runtime values for the second coordinate
+        plt.legend()
 
         plt.savefig(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
         plt.clf()
 
     # Cost of security plots
+    info2D_reader = open(filename + "parsed/info2D.txt", "r")
+
 
 # - - - - - - - - CREATE 3D PLOTS - - - - - - - - - - -
 

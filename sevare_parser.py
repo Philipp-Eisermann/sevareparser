@@ -356,6 +356,8 @@ for i in range(4):
             continue
         info_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
+# Write list of winners for plotter parsing
+
 # Parse summary file
 # Get set size from database
 
