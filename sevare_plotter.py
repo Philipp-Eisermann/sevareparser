@@ -1,6 +1,8 @@
 import argparse
 import os
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import MaxNLocator
 
 
 # SEVARE PLOTTER
@@ -22,6 +24,19 @@ def read_file(file_):
         x.append(float(dd[0]))
         y.append(float(dd[1][0:len(dd[1]) - 1]))
     return x, y
+
+
+def read_file_3D(file3D_):
+    x1 = []
+    y1 = []
+    z1 = []
+    d1 = file3D_.readlines()
+    for lin3D in range(len(d1)):
+        dd1 = d1[lin3D].split('\t')
+        x1.append(float(dd1[0]))
+        y1.append(float(dd1[1]))
+        z1.append(float(dd1[2][:len(dd1[2]) - 1]))
+    return x1, y1, z1
 
 
 # Input: protocol, String
@@ -74,7 +89,6 @@ def get_security_class(prot):
         return 2
     if prot in protocols_semi_hon:
         return 3
-
     return "error"
 
 
@@ -164,7 +178,70 @@ for prefix in prefixes:
 
 
 # - - - - - - - - CREATE 3D PLOTS - - - - - - - - - - -
+# TODO: MERGE INTO 2D PART WHEN EXTENSIVELY TESTED
 
 data_names = os.listdir(args.filename + "parsed/3D/")
+os.mkdir(filename + "plotted/3D/")
+prefixes = []
 
-prefixes = []  # variable combinations for 3D plotting
+# look at what variables where used in the experiment
+for data in data_names:
+    # only 3D files -
+    if last != data[0:8]:
+        last = data[0:8]
+        if last not in prefixes:
+            prefixes += [last]
+            # We want one directory for multiple graphs per variable
+            # Its name should be the prefix without the tailing '_'
+            os.mkdir(filename + "plotted/3D/" + last[:len(last) - 1])
+
+print(prefixes)
+print(data_names)
+for prefix in prefixes:
+    # Will hold the filenames organized by security class for the prefix of this iteration
+    protocols = [None] * 4
+    for i in range(4):
+        protocols[i] = []
+
+    # sort in the 4 classes
+    for data in data_names:
+        if data[:8] == prefix:
+            protocol_name = data[8:(len(data) - 4)]
+            print(protocol_name)
+            print(get_security_class(protocol_name))
+            protocols[get_security_class(protocol_name)] += [protocol_name]
+
+    print(protocols)
+    # create plots
+    for i in range(4):  # for each security class
+        if not protocols[i]:
+            continue
+        fig = plt.figure(figsize=(10, 10))  #TODO: find right size dimensions
+        ax = fig.add_subplot(111, projection='3d')
+        for protocol in protocols[i]:
+            # Fill up info of this security class
+            data_file_reader = open(filename + "parsed/3D/" + prefix + protocol + ".txt", "r")
+            x, y, z = read_file_3D(data_file_reader)
+
+            print(x, y, z)
+            # SOMETIMES ERROR HERE - BC OF ONLY INFO OF 1 DIM? (ex. x=[30,30,30,...]
+            surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0)
+
+            fig.colorbar(surf)
+            ax.xaxis.set_major_locator(MaxNLocator(5))
+            ax.yaxis.set_major_locator(MaxNLocator(6))
+            ax.zaxis.set_major_locator(MaxNLocator(5))
+            # plt.plot(x, y, marker='x', label=protocol, linewidth=1.0)
+            fig.tight_layout()
+
+            # Create a plot for each protocol, sorted in its security class directory
+            plt.xlabel(get_name(prefix[:4]))
+            plt.ylabel(get_name(prefix[4:8]))
+            # plt.zlabel("Runtime (s)")  # Datafiles always contain runtime values for the second coordinate
+            #plt.legend()
+
+            plt.savefig(filename + "plotted/3D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+            print("saved: " + "plotted/3D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+            plt.clf()
+
+

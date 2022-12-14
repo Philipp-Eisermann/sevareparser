@@ -260,7 +260,7 @@ for combo in plot3D_var_combo:
                     # print(var_name_array[i] + " and x[0] = " + combo[0] + " and x[1] = " + combo[1])
                     var_val_array[i] = line[index_array[i]]
                 else:
-                    var_val_array[i] = None # may be inefficient
+                    var_val_array[i] = None  # may be inefficient
             #print(protocol + " " + str(var_val_array))
             #print(str(var_name_array))
 
