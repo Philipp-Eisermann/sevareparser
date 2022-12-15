@@ -189,12 +189,13 @@ for prefix in prefixes:
         plt.clf()
 
 # Cost of security plots
-print("- generating cost of security plots")
+print("Generating cost of security plots")
 info2D_reader = open(filename + "parsed/info2D.txt", "r")
+os.mkdir(filename + "plotted/2D/CostOfSecurity/")
 info_lines = info2D_reader.readlines()
 index = 0
 while index < len(info_lines) and info_lines[index] != "Winners:\n":
-    print(info_lines[index])
+    #print(info_lines[index])
     index += 1
 
 if index >= len(info_lines):
@@ -203,16 +204,18 @@ else:
     index += 1
     # For each variable, create a cost of security plot
     for i in range(len(info_lines) - index):
-        print(info_lines[index + i])
+        #print(info_lines[index + i])
         exp_variable = info_lines[index + i].split(":")[0]
         winners = info_lines[index + i].split(":")[1].split(",")
-        if "" in winners:
-            continue
+        print(winners)
+
         for winner in winners:
+            if winner == '' or winner == '\n':
+                continue
             # Fill up info of this security class
             data_file_reader = open(filename + "parsed/2D/" + exp_variable + winner + ".txt", "r")
             x, y = read_file(data_file_reader)
-            plt.plot(x, y, marker='x', label=protocol, linewidth=1.0)
+            plt.plot(x, y, marker='x', label=winner, linewidth=1.0)
 
         # Create plot for this security class
         plt.xlabel(get_name(exp_variable))
@@ -278,6 +281,7 @@ for prefix in prefixes:
 
             if is_non_changing(x) or is_non_changing(y):
                 print(prefix + protocol + " couldn't be plotted, the x or y dimension is not represented for different points (or both).")
+                continue
 
             surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0)
 
