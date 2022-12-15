@@ -18,7 +18,6 @@ def read_file(file_):
     d = None
     # fill up x and y
     d = file_.readlines()
-    # print(d)
     for lin in range(len(d)):
         dd = d[lin].split('\t')
         x.append(float(dd[0]))
@@ -103,6 +102,16 @@ def get_name(prefix_):
     return prefix_
 
 
+# For 3D plotting, x and y arrays need to have at least 2 different values
+# Input: array of ints or floats
+def is_non_changing(array_):
+    last_ = array_[0]
+    for element in array_:
+        if element != last_:
+            return False
+    return True
+
+
 # - - - - - - - - - - ARGUMENTS - - - - - - - - -
 
 parser = argparse.ArgumentParser(
@@ -132,6 +141,7 @@ data_names = os.listdir(filename + "parsed/2D/")
 prefixes = []  # will contain the variables for 2D plotting
 last = ""
 
+print("Commencing 2D Plotting...")
 # look at what variables where used in the experiment
 for data in data_names:
     # only 2D files, so always 3 char long prefix for variable
@@ -159,6 +169,9 @@ for prefix in prefixes:
 
     # create plots
     for i in range(4):  # for each security class
+        if not protocols[i]:
+            continue
+
         for protocol in protocols[i]:
             # Fill up info of this security class
             data_file_reader = open(filename + "parsed/2D/" + prefix + protocol + ".txt", "r")
@@ -171,14 +184,49 @@ for prefix in prefixes:
         plt.legend()
 
         plt.savefig(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+        print("- saved: " + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+
         plt.clf()
 
-    # Cost of security plots
-    info2D_reader = open(filename + "parsed/info2D.txt", "r")
+# Cost of security plots
+print("- generating cost of security plots")
+info2D_reader = open(filename + "parsed/info2D.txt", "r")
+info_lines = info2D_reader.readlines()
+index = 0
+while index < len(info_lines) and info_lines[index] != "Winners:\n":
+    print(info_lines[index])
+    index += 1
+
+if index >= len(info_lines):
+    print("Did not find winners in info file.")
+else:
+    index += 1
+    # For each variable, create a cost of security plot
+    for i in range(len(info_lines) - index):
+        print(info_lines[index + i])
+        exp_variable = info_lines[index + i].split(":")[0]
+        winners = info_lines[index + i].split(":")[1].split(",")
+        if "" in winners:
+            continue
+        for winner in winners:
+            # Fill up info of this security class
+            data_file_reader = open(filename + "parsed/2D/" + exp_variable + winner + ".txt", "r")
+            x, y = read_file(data_file_reader)
+            plt.plot(x, y, marker='x', label=protocol, linewidth=1.0)
+
+        # Create plot for this security class
+        plt.xlabel(get_name(exp_variable))
+        plt.ylabel("Runtime (s)")  # Datafiles always contain runtime values for the second coordinate
+        plt.legend()
+
+        plt.savefig(filename + "plotted/2D/" + "CostOfSecurity/" + exp_variable + ".pdf")
+        print("-- saved: " + filename + "plotted/2D/" + "CostOfSecurity/" + exp_variable + ".pdf")
+
+        plt.clf()
 
 
 # - - - - - - - - CREATE 3D PLOTS - - - - - - - - - - -
-# TODO: MERGE INTO 2D PART WHEN EXTENSIVELY TESTED
+print("Commencing 3D plotting")
 
 data_names = os.listdir(args.filename + "parsed/3D/")
 os.mkdir(filename + "plotted/3D/")
@@ -187,6 +235,8 @@ prefixes = []
 # look at what variables where used in the experiment
 for data in data_names:
     # only 3D files -
+    if data == ".DS_Store":
+        continue
     if last != data[0:8]:
         last = data[0:8]
         if last not in prefixes:
@@ -195,8 +245,6 @@ for data in data_names:
             # Its name should be the prefix without the tailing '_'
             os.mkdir(filename + "plotted/3D/" + last[:len(last) - 1])
 
-print(prefixes)
-print(data_names)
 for prefix in prefixes:
     # Will hold the filenames organized by security class for the prefix of this iteration
     protocols = [None] * 4
@@ -211,20 +259,26 @@ for prefix in prefixes:
             print(get_security_class(protocol_name))
             protocols[get_security_class(protocol_name)] += [protocol_name]
 
-    print(protocols)
+
     # create plots
     for i in range(4):  # for each security class
         if not protocols[i]:
             continue
-        fig = plt.figure(figsize=(10, 10))  #TODO: find right size dimensions
+        fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection='3d')
         for protocol in protocols[i]:
             # Fill up info of this security class
             data_file_reader = open(filename + "parsed/3D/" + prefix + protocol + ".txt", "r")
             x, y, z = read_file_3D(data_file_reader)
 
-            print(x, y, z)
             # SOMETIMES ERROR HERE - BC OF ONLY INFO OF 1 DIM? (ex. x=[30,30,30,...]
+            if not x or not y or not z:
+                print(prefix + protocol + " couldn't be plotted, there is data missing for at least one dimension.")
+                continue
+
+            if is_non_changing(x) or is_non_changing(y):
+                print(prefix + protocol + " couldn't be plotted, the x or y dimension is not represented for different points (or both).")
+
             surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0)
 
             fig.colorbar(surf)

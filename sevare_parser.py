@@ -357,6 +357,20 @@ for i in range(4):
         info_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
 # Write list of winners for plotter parsing
+info_file_2D.write("\nWinners:\n")
+
+# For all variables
+for j in range(len(winners[i])):
+    # If the array does not contain a value for a variable for one security class, it won't contain values for that
+    # same variable for other security classes
+    if all((winners[h][j][0] == '') for h in range(4)):
+        continue
+    # TODO: empty rows for a variable still get put into the file
+    info_file_2D.write(var_name_array[j] + ":")
+
+    for i in range(4):
+        info_file_2D.write(winners[i][j][0]+",")
+    info_file_2D.write("\n")
 
 # Parse summary file
 # Get set size from database
