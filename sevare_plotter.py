@@ -56,6 +56,8 @@ def get_security_class(prot):
         return 2
     if prot in protocols_semi_hon:
         return 3
+    else:
+        print("ERROR: Protocol is was not recognized")
 
 
 def get_security_class_name(class_nb):
@@ -75,7 +77,7 @@ def get_security_class(prot):
     protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
     protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
     protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
-                          "brain", "malicious-rep-ring",
+                          "brain", "malicious-rep-ring", "yao", "yaoO",
                           "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin", "malicious-ccd", "ps-rep-bin",
                           "mal-shamir-bmr", "mal-rep-bmr"]
     protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
@@ -165,7 +167,10 @@ for prefix in prefixes:
     for data in data_names:
         if data[:4] == prefix:
             protocol_name = data[4:(len(data) - 4)]
-            protocols[get_security_class(protocol_name)] += [protocol_name]
+            if get_security_class(protocol_name) == "error":
+                print("- Protocol " + protocol_name + " not recognized.")
+            else:
+                protocols[get_security_class(protocol_name)] += [protocol_name]
 
     # create plots
     for i in range(4):  # for each security class
@@ -207,7 +212,7 @@ else:
         #print(info_lines[index + i])
         exp_variable = info_lines[index + i].split(":")[0]
         winners = info_lines[index + i].split(":")[1].split(",")
-        print(winners)
+        # print(winners)
 
         for winner in winners:
             if winner == '' or winner == '\n':
@@ -231,7 +236,7 @@ else:
 # - - - - - - - - CREATE 3D PLOTS - - - - - - - - - - -
 print("Commencing 3D plotting")
 
-data_names = os.listdir(args.filename + "parsed/3D/")
+data_names = os.listdir(filename + "parsed/3D/")
 os.mkdir(filename + "plotted/3D/")
 prefixes = []
 
@@ -258,8 +263,8 @@ for prefix in prefixes:
     for data in data_names:
         if data[:8] == prefix:
             protocol_name = data[8:(len(data) - 4)]
-            print(protocol_name)
-            print(get_security_class(protocol_name))
+            #print(protocol_name)
+            #print(get_security_class(protocol_name))
             protocols[get_security_class(protocol_name)] += [protocol_name]
 
 
@@ -270,7 +275,7 @@ for prefix in prefixes:
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection='3d')
         for protocol in protocols[i]:
-            # Fill up info of this security class
+
             data_file_reader = open(filename + "parsed/3D/" + prefix + protocol + ".txt", "r")
             x, y, z = read_file_3D(data_file_reader)
 
@@ -283,7 +288,15 @@ for prefix in prefixes:
                 print(prefix + protocol + " couldn't be plotted, the x or y dimension is not represented for different points (or both).")
                 continue
 
-            surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0)
+            # Bandwidth always has to be on the x axis for visibility reasons
+            if "Bdw_" == prefix[4:8]:
+                surf = ax.plot_trisurf(y, x, z, cmap=cm.jet, linewidth=0)
+                plt.ylabel(get_name(prefix[:4]))
+                plt.xlabel(get_name(prefix[4:8]))
+            else:
+                surf = ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0)
+                plt.xlabel(get_name(prefix[:4]))
+                plt.ylabel(get_name(prefix[4:8]))
 
             fig.colorbar(surf)
             ax.xaxis.set_major_locator(MaxNLocator(5))
@@ -293,13 +306,12 @@ for prefix in prefixes:
             fig.tight_layout()
 
             # Create a plot for each protocol, sorted in its security class directory
-            plt.xlabel(get_name(prefix[:4]))
-            plt.ylabel(get_name(prefix[4:8]))
+
             # plt.zlabel("Runtime (s)")  # Datafiles always contain runtime values for the second coordinate
             #plt.legend()
 
-            plt.savefig(filename + "plotted/3D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
-            print("saved: " + "plotted/3D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+            plt.savefig(filename + "plotted/3D/" + prefix[:len(last) - 1] + "/" + protocol + ".pdf")
+            print("-- saved: " + "plotted/3D/" + prefix[:len(last) - 1] + "/" + protocol + ".pdf")
             plt.clf()
 
 

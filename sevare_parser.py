@@ -83,7 +83,7 @@ def get_security_class(prot):
     protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
     protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
     protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
-                          "brain", "malicious-rep-ring",
+                          "brain", "malicious-rep-ring", "yao", "yaoO",
                           "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin", "malicious-ccd", "ps-rep-bin",
                           "mal-shamir-bmr", "mal-rep-bmr"]
     protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
@@ -96,6 +96,8 @@ def get_security_class(prot):
         return 2
     if prot in protocols_semi_hon:
         return 3
+    else:
+        print("ERROR: Protocol is was not recognized")
 
 
 def get_security_class_name(class_nb):
@@ -154,7 +156,7 @@ for i in range(len(header)):
         if header[i] == variable_array[j]:
             index_array[j] = i
 
-    if header[i] == "runtime_internal(s)":  # Name from the table
+    if header[i] == "runtime_internal(s)" or header[i] == "runtime(s)":  # Name from the table
         runtime_index = i
     elif header[i] == "protocol":  # Name from the table
         protocol_index = i
@@ -164,8 +166,8 @@ for i in range(len(header)):
 
 
 # Uses simple get_sorting function to sort
-if sorting_index != -1:
-    dataset_array = sorted(dataset_array, key=get_sorting)
+# if sorting_index != -1:
+#    dataset_array = sorted(dataset_array, key=get_sorting)
 
 if not os.path.exists(filename + "parsed/2D"):
     os.mkdir(filename + "parsed/2D")
@@ -185,6 +187,7 @@ for li in dataset:
 
 # - - - - - - - Parsing for 2D plots - - - - - - - -
 # Go through dataset for each variable
+print(index_array)
 for i in range(len(index_array)):
     # Only parse for variables that are measured in the table
     if index_array[i] == -1:
@@ -320,9 +323,9 @@ for i in range(len(plots2D)):
                 continue
             info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
 
-    elif plot_type == "Set_":
-        print("Not plotting for set for now")
-        continue
+    #elif plot_type == "Set_":
+    #    print("Not plotting for set for now")
+    #    continue
 
     else:
         f = interpolate_file(plot, 2)
@@ -352,7 +355,7 @@ info_file_2D.write("\n\n\nProtocol Winners:\n\n")
 for i in range(4):
     info_file_2D.write(get_security_class_name(i) + " protocols:\n")
     for j in range(len(winners[i])):
-        if winners[i][j][0] == "":
+        if winners[i][j][0] == "" or winners[i][j][1] == -1:
             continue
         info_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
@@ -369,7 +372,9 @@ for j in range(len(winners[i])):
     info_file_2D.write(var_name_array[j] + ":")
 
     for i in range(4):
-        info_file_2D.write(winners[i][j][0]+",")
+        #print(winners[i])
+        if winners[i][j][1] != -1:
+            info_file_2D.write(winners[i][j][0]+",")
     info_file_2D.write("\n")
 
 # Parse summary file
