@@ -14,3 +14,6 @@ Remarks about datatable:
 > the very large values as first y makes the interpolation completely errouneous (but no runtime error)
 
 --> The winner search picks the best protocols based on their first coefficient which may be needed to be updated for some variables such as bandwidth, where the second coefficient (indicator of the bandwidth bottleneck of the protocol)
+
+--> If the experiment types were to be extended:
+> Make sure than the short form of the prefix DOES NOT start with "." (causes problem in plotter)

@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import MaxNLocator
-
+import pickle
 
 # SEVARE PLOTTER
 # Will create a /plotted directory and write everything in there
@@ -71,28 +71,6 @@ def get_security_class_name(class_nb):
         return "Semi-Honest, Honest Majority"
 
 
-# Input: protocol, String
-# Output: Integer (-1 -> did not find protocol, 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon)
-def get_security_class(prot):
-    protocols_mal_dis = ["mascot", "lowgear", "highgear", "chaigear", "cowgear", "spdz2k", "tinier", "real-bmr"]
-    protocols_mal_hon = ["hemi", "semi", "temi", "soho", "semi2k", "semi-bmr", "semi-bin"]
-    protocols_semi_dis = ["sy-shamir", "malicious-shamir", "malicious-rep-field", "ps-rep-field", "sy-rep-field",
-                          "brain", "malicious-rep-ring", "yao", "yaoO",
-                          "ps-rep-ring", "sy-rep-ring", "malicious-rep-bin", "malicious-ccd", "ps-rep-bin",
-                          "mal-shamir-bmr", "mal-rep-bmr"]
-    protocols_semi_hon = ["atlas", "shamir", "replicated-field", "replicated-ring", "shamir-bmr", "rep-bmr",
-                          "replicated-bin", "ccd"]
-    if prot in protocols_mal_dis:
-        return 0
-    if prot in protocols_mal_hon:
-        return 1
-    if prot in protocols_semi_dis:
-        return 2
-    if prot in protocols_semi_hon:
-        return 3
-    return "error"
-
-
 # Is used to generate the axis labels of plots
 def get_name(prefix_):
     prefix_names = ["Latency (ms)", "Bandwidths (Mbit/s)", "Packet Loss (%)", "Frequency (GHz)", "Quotas(%)",
@@ -135,6 +113,8 @@ colors = ['black', 'blue', 'brown', 'cyan', 'darkgray', 'gray', 'green', 'lightg
 # Create directories
 os.mkdir(filename + "plotted/")
 os.mkdir(filename + "plotted/2D")
+os.mkdir(filename + "saved/")
+os.mkdir(filename + "saved/2D")
 
 # - - - - - - - - CREATE 2D PLOTS - - - - - - - - - - -
 
@@ -144,7 +124,7 @@ prefixes = []  # will contain the variables for 2D plotting
 last = ""
 
 print("Commencing 2D Plotting...")
-# look at what variables where used in the experiment
+# look at what variables were used in the experiment
 for data in data_names:
     # only 2D files, so always 3 char long prefix for variable
     if last != data[0:4]:
@@ -154,6 +134,7 @@ for data in data_names:
             # We want one directory for multiple graphs per variable
             # Its name should be the prefix without the tailing '_'
             os.mkdir(filename + "plotted/2D/" + last[:len(last) - 1])
+            os.mkdir(filename + "saved/2D/" + last[:len(last) - 1])
 
 # The runtime is in O(n*m) where n is nb of protocols and m nb of variables
 # We need to go through all files for each variable to get all the datafiles for a variable to plot them together
@@ -181,17 +162,21 @@ for prefix in prefixes:
             # Fill up info of this security class
             data_file_reader = open(filename + "parsed/2D/" + prefix + protocol + ".txt", "r")
             x, y = read_file(data_file_reader)
-            plt.plot(x, y, marker='x', label=protocol, linewidth=1.0)
+            fig, ax = plt.subplots()
+            ax.plot(x, y, marker='x', label=protocol, linewidth=1.0)
 
         # Create plot for this security class
-        plt.xlabel(get_name(prefix))
-        plt.ylabel("Runtime (s)")  # Datafiles always contain runtime values for the second coordinate
-        plt.legend()
+        ax.set_xlabel(get_name(prefix))
+        ax.set_ylabel("Runtime (s)") # Datafiles always contain runtime values for the second coordinate
+        # fig.ylabel("Runtime (s)")
+        ax.legend()
 
-        plt.savefig(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
+        fig.savefig(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
         print("- saved: " + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".pdf")
 
-        plt.clf()
+        with open(filename + 'saved/2D/' + prefix[:len(last) - 1] + "/" + get_security_class_name(i), 'wb') as f:
+            pickle.dump(fig, f)
+        # fig.clf()
 
 # Cost of security plots
 print("Generating cost of security plots")
