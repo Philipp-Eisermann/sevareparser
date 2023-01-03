@@ -107,6 +107,12 @@ filename = args.filename
 if filename[len(args.filename) - 1] != '/':
     filename += '/'
 
+# - - - - - - - - - INITIALISATION - - - - - -
+# Check if the parser was executed before
+if "parsed" not in os.listdir(filename):
+    print("Could not find the parsed directory, make sure you executed SevareParser before calling the plotter.")
+    exit()
+
 colors = ['black', 'blue', 'brown', 'cyan', 'darkgray', 'gray', 'green', 'lightgray', 'lime', 'magenta', 'olive',
           'orange', 'pink', 'purple', 'red', 'teal', 'violet', 'white', 'yellow']
 

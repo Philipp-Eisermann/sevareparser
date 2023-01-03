@@ -5,6 +5,7 @@ import subprocess
 colors = ['black', 'blue', 'brown', 'cyan', 'darkgray', 'gray', 'green', 'lightgray', 'lime', 'magenta', 'olive',
           'orange', 'pink', 'purple', 'red', 'teal', 'violet', 'white', 'yellow']
 
+
 # Input: protocol, String
 # Output: Integer (-1 -> did not find protocol, 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon)
 def get_security_class(prot):
@@ -69,11 +70,11 @@ def generate_tex_plot(tex_name, exp_prefix, included_protocols):
     tex_writer.write("\\begin{document}\n\n")
 
     tex_writer.write("\\begin{frame}\n")
-    tex_writer.write("    \\frametitle{MP-Slice Runtimes Datatype -d 1}\n")
+    # tex_writer.write("    \\frametitle{MP-Slice Runtimes Datatype -d 1}\n")
     tex_writer.write("    \\begin{figure}\n")
     tex_writer.write("        \\begin{tikzpicture}\n")
     tex_writer.write("            \\begin{axis}[\n")
-    tex_writer.write("                xlabel={" + get_name(exp_prefix) + "}, ylabel={runtime [s]},legend pos=north west]\n")
+    tex_writer.write("                xlabel={" + get_name(exp_prefix) + "}, ylabel={runtime [s]},legend style={anchor=west, legend pos=outer north east}]\n")
 
     for g in range(len(included_protocols)):
         tex_writer.write("                \\addplot[mark=|, color= " + colors[g] + ",   thick] table {../../../" + path + exp_prefix + included_protocols[g] + ".txt};\n")
@@ -84,6 +85,51 @@ def generate_tex_plot(tex_name, exp_prefix, included_protocols):
         tex_writer.write(included_protocol + ",")
 
     tex_writer.write("}\n")
+    tex_writer.write("            \\end{axis}\n")
+    tex_writer.write("        \\end{tikzpicture}\n")
+
+    tex_writer.write("        \\begin{itemize}\n")
+    tex_writer.write("            \\item Ref.Problem: Scalable Search\n")
+    tex_writer.write("            \\item Library: MP-Slice - Datatype -d 1\n")
+    tex_writer.write("            \\item Metric: input size - runtime\n")
+    tex_writer.write("            \\item Specs: D-1518(2.2GHz) 32GiB 1Gbits\n")
+    tex_writer.write("        \\end{itemize}\n")
+
+    tex_writer.write("    \\end{figure}\n")
+    tex_writer.write("\\end{frame}\n")
+    tex_writer.write("\\end{document}")
+
+    tex_writer.close()
+
+
+def generate_tex_3Dplot(tex_name, exp_prefix, included_protocol):
+    """
+        Creates a .tex file for a single 3D plot
+        :param tex_name: name of the tex file
+        :param exp_prefix: prefix (giving the experiment variable(s)) of the datafile
+        :param included_protocol: String name of the protocol to be plotted (can only be one)
+        // Path + prefix + included_protocol must point to the txt datafile of the protocol
+    """
+    var1 = exp_prefix[:4]
+    var2 = exp_prefix[4:8]
+    path = "/parsed/3D/"
+    tex_writer = open(tex_name, "w")
+    tex_writer.write(r'\documentclass[8pt]{beamer}')
+
+    tex_writer.write("\\setbeamertemplate{itemize item}{$-$}\n")
+    tex_writer.write("\\usepackage{pgf}\n")
+    tex_writer.write("\\usepackage{pgfplots}\n")
+    tex_writer.write("\\pgfplotsset{compat=newest}\n\n")
+
+    tex_writer.write("\\begin{document}\n\n")
+
+    tex_writer.write("\\begin{frame}\n")
+    # tex_writer.write("    \\frametitle{MP-Slice Runtimes Datatype -d 1}\n")
+    tex_writer.write("    \\begin{figure}\n")
+    tex_writer.write("        \\begin{tikzpicture}\n")
+    tex_writer.write("            \\begin{axis}[\n")
+    tex_writer.write("                xlabel={" + get_name(var1) + "}, ylabel={" + get_name(var2) + ", zlabel={runtime [s]},legend pos=north west]\n")
+    tex_writer.write("                \\addplot[surf] table {../../../" + path + exp_prefix + included_protocol + ".txt};\n")
     tex_writer.write("            \\end{axis}\n")
     tex_writer.write("        \\end{tikzpicture}\n")
 
@@ -115,6 +161,12 @@ filename = args.filename
 
 if filename[len(args.filename) - 1] != '/':
     filename += '/'
+
+# - - - - - - - - - INIT  - - - - - - - - - - - - -
+# Check if the parser was executed before
+if "parsed" not in os.listdir(filename):
+    print("Could not find the parsed directory, make sure you executed SevareParser before calling the plotter.")
+    exit()
 
 # Create directories
 os.mkdir(filename + "plotted/")

@@ -129,8 +129,20 @@ if filename[len(args.filename)-1] != '/':
 
 # ------- PARSING ---------
 
-# file reader for the database - throws FileNotFoundError if file doesn't exist
-f = open(filename + "data/E31_short_results.csv")
+# Open datatable
+files = [f for f in os.listdir(filename + "data/") if f.endswith(".csv") and "full" in f]
+if len(files) > 0:
+    print("Found full results table...")
+    f = files[0]
+else:
+    files = [f for f in os.listdir(filename + "data/") if f.endswith(".csv") and "short" in f]
+    if len(files) > 0:
+        print("Found short results table...")
+        f = files[0]
+    else:
+        print("Could neither find a short or a full results table in the data/ directory.")
+
+f = open(filename + "data/" + f)
 
 if not os.path.exists(filename + "parsed"):
     os.mkdir(filename + "parsed")
