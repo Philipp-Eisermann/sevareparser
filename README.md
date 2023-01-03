@@ -17,3 +17,8 @@ Remarks about datatable:
 
 --> If the experiment types were to be extended:
 > Make sure than the short form of the prefix DOES NOT start with "." (causes problem in plotter)
+
+Required Packages:
+> SevareParser and SevarePlotter use numpy and scipy, which can be installed using pip:
+sudo apt install python3-pip
+pip3 install -U numpy scipy
