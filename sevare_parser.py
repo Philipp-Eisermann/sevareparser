@@ -53,8 +53,8 @@ def interpolate_exponential(file_):
     if x == [] or y == []:
         return [0, 0]
 
-    print(x[0])
-    print(y[0])
+    #print(x[0])
+    #print(y[0])
 
     if len(x) < 5:
         return [-1, -1]
@@ -111,6 +111,22 @@ def get_security_class_name(class_nb):
         return "Semi-Honest, Honest Majority"
 
 
+# Adds empty lines to a 3D datafile each time the x coordinate changes
+def add_empty_lines(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    with open(file_path, 'w') as file:
+        previous_x = None
+        for line_ in lines:
+            print(line)
+            x_, y_, z_ = line_.split('\t')
+            if x_ != previous_x:
+                file.write('\n')
+            file.write(line_)
+            previous_x = x_
+
+
 # ----- ARGUMENTS --------
 parser = argparse.ArgumentParser(
     description='This program parses the measurement folder outputted by sevare-bench (version from 11/22).')
@@ -141,6 +157,7 @@ else:
         f = files[0]
     else:
         print("Could neither find a short or a full results table in the data/ directory.")
+        exit()
 
 f = open(filename + "data/" + f)
 
@@ -237,6 +254,7 @@ for i in range(len(index_array)):
             # TODO: Check if additional file with y=
 
 datafile2D.close()
+
 # - - - - - - 3D PLOTTING - - - - - - -
 var_val_array = [None] * len(variable_array)  # reset vars
 plot3D_var_combo = [("Set_", "Lat_"), ("Set_", "Bdw_"), ("Lat_", "Frq_"), ("Bdw_", "Frq_"), ("Lat_", "Bdw_"), ("Lat_", "Pdr_"), ("Bdw_", "Pdr_")]
@@ -283,6 +301,7 @@ for combo in plot3D_var_combo:
         if all((var_val_array[i] is None or var_val_array[i] == line[index_array[i]]) for i in range(len(index_array))):
             datafile3D.write(line[index_array[index_0]] + '\t' + line[index_array[index_1]] + '\t' + line[runtime_index] + '\n')
 
+    add_empty_lines(filename + "parsed/3D/" + combo[0] + combo[1] + protocol + ".txt")
 
 # ----  INTERPOLATION & WINNER SEARCH for 2D experiments -------
 # winners is a two dimensional array

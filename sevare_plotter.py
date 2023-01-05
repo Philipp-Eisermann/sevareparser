@@ -231,7 +231,7 @@ data_names = os.listdir(filename + "parsed/3D/")
 os.mkdir(filename + "plotted/3D/")
 prefixes = []
 
-# look at what variables where used in the experiment
+# look at what variables were used in the experiment
 for data in data_names:
     # only 3D files -
     if data == ".DS_Store":
