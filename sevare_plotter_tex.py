@@ -129,7 +129,7 @@ def generate_tex_3Dplot(tex_name, exp_prefix, included_protocol):
     tex_writer.write("        \\begin{tikzpicture}\n")
     tex_writer.write("            \\begin{axis}[\n")
     tex_writer.write("                xlabel={" + get_name(var1) + "}, ylabel={" + get_name(var2) + "}, zlabel={runtime [s]}]\n")
-    tex_writer.write("                \\addplot3[] table {../../../" + path + exp_prefix + included_protocol + ".txt};\n")
+    tex_writer.write("                \\addplot3[surf] table {../../.." + path + exp_prefix + included_protocol + ".txt};\n")
     tex_writer.write("            \\end{axis}\n")
     tex_writer.write("        \\end{tikzpicture}\n")
 
@@ -222,7 +222,7 @@ for prefix in prefixes:
 
 # Generate cost of security plots
 print("Generating cost of security tex files")
-info2D_reader = open(filename + "parsed/info2D.txt", "r")
+info2D_reader = open(filename + "parsed/runtimes2D.txt", "r")
 os.mkdir(filename + "plotted/2D/CostOfSecurity/")
 info_lines = info2D_reader.readlines()
 index = 0

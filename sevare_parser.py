@@ -37,13 +37,16 @@ def read_file(file_):
 
 # This function will write the interpolation function at the end of each file contained in file_array
 # is_linear indicates if all files should be interpolated linearly or not (true=linear interpolation)
-def interpolate_file(file_, degree):
+def interpolate_file(file_, degree, comm_rounds="nothing"):
     x, y = read_file(file_)
     if x == [] or y == []:
         return [0, 0]
 
     if len(x) < 5:
         return [-1, -1]
+
+    if comm_rounds != "nothing":
+        x = [el * comm_rounds for el in x]
 
     return np.polyfit(x, y, degree)
 
@@ -54,7 +57,7 @@ def interpolate_exponential(file_):
         return [0, 0]
 
     #print(x[0])
-    #print(y[0])
+    # print(y[0])
 
     if len(x) < 5:
         return [-1, -1]
@@ -63,7 +66,7 @@ def interpolate_exponential(file_):
     return popt
 
 
-def interpolate_inverse(file_):
+def interpolate_inverse(file_, data_sent="nothing"):
     x, y = read_file(file_)
     if x == [] or y == []:
         return [0, 0]
@@ -71,9 +74,20 @@ def interpolate_inverse(file_):
     if len(x) < 5:
         return [-1, -1]
 
+    if data_sent == "nothing":
+        popt, pcov = curve_fit(lambda t, a, b: a / t + b, x, y)
+    else:
+        popt, pcov = curve_fit(lambda t, a, b: (a * data_sent) / t + b, x, y)
+
     # popt, pcov = curve_fit(lambda t, a, b, c: a * np.exp(b * t) + c, x.reverse(), y)
-    popt, pcov = curve_fit(lambda t, a, b: a/t + b, x, y)
     # popt, pcov = curve_fit(lambda t, a, b, c: a*t**2 + b*t + c, x, y)
+
+    '''
+        if data_sent != "nothing":
+            x = [el / data_sent for el in x]
+
+    return np.polyfit(x, y, degree)
+    '''
     return popt
 
 
@@ -119,7 +133,7 @@ def add_empty_lines(file_path):
     with open(file_path, 'w') as file:
         previous_x = None
         for line_ in lines:
-            print(line)
+            # print(line)
             x_, y_, z_ = line_.split('\t')
             if x_ != previous_x:
                 file.write('\n')
@@ -164,7 +178,8 @@ f = open(filename + "data/" + f)
 if not os.path.exists(filename + "parsed"):
     os.mkdir(filename + "parsed")
 
-info_file_2D = open(filename + "parsed/info2D.txt", "a")
+runtimes_file_2D = open(filename + "parsed/runtimes2D.txt", "a")
+info_file = open(filename + "parsed/protocol_infos.txt", "a")
 
 header = f.readline().split(';')
 
@@ -172,11 +187,16 @@ runtime_index = -1
 protocol_index = -1
 sorting_index = -1
 
+comm_rounds_index = -1
+data_sent_index = -1
+
 variable_array = ["latencies(ms)", "bandwidths(Mbs)", "packetdrops(%)", "freqs(GHz)", "quotas(%)", "cpus", "input_size"]  # Names from the table!
 var_name_array = ["Lat_", "Bdw_", "Pdr_", "Frq_", "Quo_", "Cpu_", "Set_"]  # HAS TO MATCH ABOVE ARRAY - values are hardcoded within script!
 var_val_array = [None] * len(variable_array)  # used to store changing variables
 index_array = [-1] * len(variable_array)
 datafile_array = [None] * len(variable_array)
+
+
 
 # Get indexes of demanded columns
 for i in range(len(header)):
@@ -190,9 +210,13 @@ for i in range(len(header)):
     elif header[i] == "protocol":  # Name from the table
         protocol_index = i
     # Sorting index
-    if header[i] == args.s:
+    elif header[i] == args.s:
         sorting_index = i
-
+    # Metrics indexes
+    elif header[i] == "P0dataSent(MB)":
+        comm_rounds_index = i
+    elif header[i] == "ALLdataSent(MB)":  # "P0dataSent(MB)"
+        data_sent_index = i
 
 # Uses simple get_sorting function to sort
 # if sorting_index != -1:
@@ -208,6 +232,8 @@ if not os.path.exists(filename + "parsed/3D"):
 f.readline().split(';')
 protocol = ""
 protocols = []
+comm_rounds_array = []
+data_sent_array = []
 
 dataset = f.readlines()
 dataset_array = []
@@ -216,7 +242,7 @@ for li in dataset:
 
 # - - - - - - - Parsing for 2D plots - - - - - - - -
 # Go through dataset for each variable
-print(index_array)
+# print(index_array)
 for i in range(len(index_array)):
     # Only parse for variables that are measured in the table
     if index_array[i] == -1:
@@ -247,6 +273,10 @@ for i in range(len(index_array)):
                 else:
                     var_val_array[j] = None  # may be inefficient
             # print(protocol + str(var_name_array[i]) + str(var_val_array))
+
+            # Fill up metrics arrays
+            comm_rounds_array.append(line[comm_rounds_index])
+            data_sent_array.append(line[data_sent_index])
 
         # Only parse line when it shows the initial values of controlled variables
         if all((var_val_array[j] is None or var_val_array[j] == line[index_array[j]]) for j in range(len(index_array))):
@@ -320,39 +350,56 @@ for i in range(4):
 plots2D = os.listdir(filename + "parsed/2D/")
 # print(plots2D)
 
+print(comm_rounds_array)
 # Interolate generated files
 for i in range(len(plots2D)):
     plot = open(filename + "parsed/2D/" + plots2D[i], "r")
     plot_type = plots2D[i][0:4]  # String
-    protocol = plots2D[i][4:(len(plots2D[i])-4)]  # Reparse protocol name from file name - may be optimisable
+
+    # Reparse protocol name from file name - may be optimisable
+    protocol = plots2D[i][4:(len(plots2D[i])-4)]
     print(protocol)
-    # print(plots2D[i])
+
+    prot_comm_rounds = comm_rounds_array[protocols.index(protocol)]
+    if prot_comm_rounds[0] == "~":
+        prot_comm_rounds = prot_comm_rounds[1:]
+    elif prot_comm_rounds == "NA":
+        prot_comm_rounds = -1
+    prot_comm_rounds = float(prot_comm_rounds)
+    print(prot_comm_rounds)
+
+    prot_data_sent = data_sent_array[protocols.index(protocol)]
+    prot_comm_rounds = float(prot_comm_rounds)
+
     if plot_type == "Lat_":
-        f = interpolate_file(plot, 1)
+        # f = interpolate_file(plot, 1)
+        f = interpolate_file(plot, 1, prot_comm_rounds)  # Using 3rd argument of function
         # var_name index of Lat_ is 0, use var_name_array.index(plots2D[i][0:4]) if changed
-        info_file_2D.write(
+        runtimes_file_2D.write(
             plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
+        f[0] = f[0] / prot_comm_rounds
+        info_file.write(plots2D[i] + " -> " + str(f[0]) + "\n")
 
     elif plot_type == "Pdr_":
         # f has the form a*e^(b*x) + c
         f = interpolate_exponential(plot)
         if f == [-1, -1]:
-            info_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
-            info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n")
+            runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n")
 
     elif plot_type == "Bdw_":
         # f has the form a/x + b
         f = interpolate_inverse(plot)
         if f[0] == -1:
-            info_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
             if f[0] < 0:
-                info_file_2D.write(plots2D[i] + " -> error: preprocessing phase")  # See remark in README.md
+                runtimes_file_2D.write(plots2D[i] + " -> error: preprocessing phase")  # See remark in README.md
                 continue
-            info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
+            runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
 
     #elif plot_type == "Set_":
     #    print("Not plotting for set for now")
@@ -361,11 +408,11 @@ for i in range(len(plots2D)):
     else:
         f = interpolate_file(plot, 2)
         if f == [-1, -1]:
-            info_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
         else:
-            info_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
+            runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
     # for j in range(2):  # range has to be degree given in prior line
-    #   info_file_2D.write(" " + str(f[j]) + " * x**" + str(j) + " ")
+    #   runtimes_file_2D.write(" " + str(f[j]) + " * x**" + str(j) + " ")
 
     first_index = get_security_class(protocol)
     second_index = var_name_array.index(plot_type)  # Int
@@ -381,17 +428,17 @@ for i in range(len(plots2D)):
     #print(winners[3])
 
 # Write all winners in table
-info_file_2D.write("\n\n\nProtocol Winners:\n\n")
+runtimes_file_2D.write("\n\n\nProtocol Winners:\n\n")
 # Go through security class
 for i in range(4):
-    info_file_2D.write(get_security_class_name(i) + " protocols:\n")
+    runtimes_file_2D.write(get_security_class_name(i) + " protocols:\n")
     for j in range(len(winners[i])):
         if winners[i][j][0] == "" or winners[i][j][1] == -1:
             continue
-        info_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
+        runtimes_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
 # Write list of winners for plotter parsing
-info_file_2D.write("\nWinners:\n")
+runtimes_file_2D.write("\nWinners:\n")
 
 # For all variables
 for j in range(len(winners[i])):
@@ -400,14 +447,18 @@ for j in range(len(winners[i])):
     if all((winners[h][j][0] == '') for h in range(4)):
         continue
     # TODO: empty rows for a variable still get put into the file
-    info_file_2D.write(var_name_array[j] + ":")
+    runtimes_file_2D.write(var_name_array[j] + ":")
 
     for i in range(4):
         #print(winners[i])
         if winners[i][j][1] != -1:
-            info_file_2D.write(winners[i][j][0]+",")
-    info_file_2D.write("\n")
+            runtimes_file_2D.write(winners[i][j][0]+",")
+    runtimes_file_2D.write("\n")
 
 # Parse summary file
 # Get set size from database
 
+
+# - - - - - - Finish - - - - - -
+runtimes_file_2D.close()
+info_file.close()
