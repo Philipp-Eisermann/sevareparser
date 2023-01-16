@@ -5,6 +5,9 @@ Guide:
 > If the /parsed directory already exists, SevareParser will delete nothing but append to all the files it intended to create and write on
 
 Remarks about datatable: 
+
+--> Best practice: make the parameter ranges go from least contraining to most constraining
+> For parsing 2D data files from the 3+ variable tables, the parser always takes the first appearing values of parameters that are not being plotted in this iteration. 
   
 --> The table MUST NOT contain lines with equal values of the variable array (see variable_array) 
 > this only happens if the protocol was run multiple times for same parameter values in the same run

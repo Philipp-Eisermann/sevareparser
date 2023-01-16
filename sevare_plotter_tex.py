@@ -222,9 +222,9 @@ for prefix in prefixes:
 
 # Generate cost of security plots
 print("Generating cost of security tex files")
-info2D_reader = open(filename + "parsed/runtimes2D.txt", "r")
+interpolations2D_reader = open(filename + "parsed/interpolations2D.txt", "r")
 os.mkdir(filename + "plotted/2D/CostOfSecurity/")
-info_lines = info2D_reader.readlines()
+info_lines = interpolations2D_reader.readlines()
 index = 0
 while index < len(info_lines) and info_lines[index] != "Winners:\n":
     index += 1

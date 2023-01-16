@@ -46,8 +46,8 @@ def interpolate_file(file_, degree, comm_rounds="nothing"):
         print("Not enough datapoints")
         return [-1, -1]
 
-    if comm_rounds != "nothing":
-        x = [el * comm_rounds for el in x]
+    #if comm_rounds != "nothing":
+    #    x = [el * comm_rounds for el in x]
 
     return np.polyfit(x, y, degree)
 
@@ -179,8 +179,8 @@ f = open(filename + "data/" + f)
 if not os.path.exists(filename + "parsed"):
     os.mkdir(filename + "parsed")
 
-runtimes_file_2D = open(filename + "parsed/runtimes2D.txt", "a")
-info_file = open(filename + "parsed/protocol_infos.txt", "a")
+interpolations_file_2D = open(filename + "parsed/interpolations2D.txt", "a")
+info_file = open(filename + "parsed/protocols_infos.txt", "a")
 
 header = f.readline().split(';')
 
@@ -214,7 +214,7 @@ for i in range(len(header)):
     elif header[i] == args.s:
         sorting_index = i
     # Metrics indexes
-    elif header[i] == "P0dataSent(MB)":
+    elif header[i] == "P0commRounds":
         comm_rounds_index = i
     elif header[i] == "ALLdataSent(MB)":  # "P0dataSent(MB)"
         data_sent_index = i
@@ -379,45 +379,44 @@ for i in range(len(plots2D)):
         # f = interpolate_file(plot, 1)
         f = interpolate_file(plot, 1, prot_comm_rounds)  # Using 3rd argument of function
         # var_name index of Lat_ is 0, use var_name_array.index(plots2D[i][0:4]) if changed
-        runtimes_file_2D.write(
+        interpolations_file_2D.write(
             plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
         f[0] = f[0] / prot_comm_rounds
-        info_file.write(plots2D[i] + " -> " + str(f[0]) + "\n")
+        info_file.write(plots2D[i] + " -> " + str(f[0]) + "with " + str(prot_comm_rounds) + "\n")
 
     elif plot_type == "Pdr_":
         # f has the form a*e^(b*x) + c
         f = interpolate_exponential(plot)
         if f[0] == -1 and f[1] == -1:
-            runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            interpolations_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
-            runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n")
+            interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n")
 
     elif plot_type == "Bdw_":
         # f has the form a/x + b
         f = interpolate_inverse(plot)
         if f[0] == -1:
-            runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            interpolations_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
             if f[0] < 0:
-                runtimes_file_2D.write(plots2D[i] + " -> error: preprocessing phase")  # See remark in README.md
+                interpolations_file_2D.write(plots2D[i] + " -> error: preprocessing phase")  # See remark in README.md
                 continue
-            runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
+            interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
 
-    #elif plot_type == "Set_":
-    #    print("Not plotting for set for now")
-    #    continue
+    elif plot_type == "Set_":
+        continue
 
     else:
         f = interpolate_file(plot, 2)
-        print(f)
+        # print(f)
         if f[0] == -1 and f[1] == -1:
-            runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
+            interpolations_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
         else:
-            runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
+            interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
     # for j in range(2):  # range has to be degree given in prior line
-    #   runtimes_file_2D.write(" " + str(f[j]) + " * x**" + str(j) + " ")
+    #   interpolations_file_2D.write(" " + str(f[j]) + " * x**" + str(j) + " ")
 
     first_index = get_security_class(protocol)
     second_index = var_name_array.index(plot_type)  # Int
@@ -433,17 +432,17 @@ for i in range(len(plots2D)):
     #print(winners[3])
 
 # Write all winners in table
-runtimes_file_2D.write("\n\n\nProtocol Winners:\n\n")
+interpolations_file_2D.write("\n\n\nProtocol Winners:\n\n")
 # Go through security class
 for i in range(4):
-    runtimes_file_2D.write(get_security_class_name(i) + " protocols:\n")
+    interpolations_file_2D.write(get_security_class_name(i) + " protocols:\n")
     for j in range(len(winners[i])):
         if winners[i][j][0] == "" or winners[i][j][1] == -1:
             continue
-        runtimes_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
+        interpolations_file_2D.write("- " + winners[i][j][0] + " was best for " + var_name_array[j] + " with a coefficient of: " + str(winners[i][j][1]) + "\n")
 
 # Write list of winners for plotter parsing
-runtimes_file_2D.write("\nWinners:\n")
+interpolations_file_2D.write("\nWinners:\n")
 
 # For all variables
 for j in range(len(winners[i])):
@@ -452,18 +451,18 @@ for j in range(len(winners[i])):
     if all((winners[h][j][0] == '') for h in range(4)):
         continue
     # TODO: empty rows for a variable still get put into the file
-    runtimes_file_2D.write(var_name_array[j] + ":")
+    interpolations_file_2D.write(var_name_array[j] + ":")
 
     for i in range(4):
         #print(winners[i])
         if winners[i][j][1] != -1:
-            runtimes_file_2D.write(winners[i][j][0]+",")
-    runtimes_file_2D.write("\n")
+            interpolations_file_2D.write(winners[i][j][0]+",")
+    interpolations_file_2D.write("\n")
 
 # Parse summary file
 # Get set size from database
 
 
 # - - - - - - Finish - - - - - -
-runtimes_file_2D.close()
+interpolations_file_2D.close()
 info_file.close()
