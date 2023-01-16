@@ -43,6 +43,7 @@ def interpolate_file(file_, degree, comm_rounds="nothing"):
         return [0, 0]
 
     if len(x) < 5:
+        print("Not enough datapoints")
         return [-1, -1]
 
     if comm_rounds != "nothing":
@@ -131,7 +132,7 @@ def add_empty_lines(file_path):
         lines = file.readlines()
 
     with open(file_path, 'w') as file:
-        previous_x = None
+        previous_x = lines[0].split('\t')[0]
         for line_ in lines:
             # print(line)
             x_, y_, z_ = line_.split('\t')
@@ -229,7 +230,6 @@ if not os.path.exists(filename + "parsed/3D"):
     os.mkdir(filename + "parsed/3D")
 
 # Create array of dataset
-f.readline().split(';')
 protocol = ""
 protocols = []
 comm_rounds_array = []
@@ -331,7 +331,11 @@ for combo in plot3D_var_combo:
         if all((var_val_array[i] is None or var_val_array[i] == line[index_array[i]]) for i in range(len(index_array))):
             datafile3D.write(line[index_array[index_0]] + '\t' + line[index_array[index_1]] + '\t' + line[runtime_index] + '\n')
 
-    add_empty_lines(filename + "parsed/3D/" + combo[0] + combo[1] + protocol + ".txt")
+
+# Add empty lines to the data files for latex
+plots3D = os.listdir(filename + "parsed/3D/")
+for plot3D in plots3D:
+    add_empty_lines(filename + "parsed/3D/" + plot3D)
 
 # ----  INTERPOLATION & WINNER SEARCH for 2D experiments -------
 # winners is a two dimensional array
@@ -383,7 +387,7 @@ for i in range(len(plots2D)):
     elif plot_type == "Pdr_":
         # f has the form a*e^(b*x) + c
         f = interpolate_exponential(plot)
-        if f == [-1, -1]:
+        if f[0] == -1 and f[1] == -1:
             runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
@@ -407,7 +411,8 @@ for i in range(len(plots2D)):
 
     else:
         f = interpolate_file(plot, 2)
-        if f == [-1, -1]:
+        print(f)
+        if f[0] == -1 and f[1] == -1:
             runtimes_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
         else:
             runtimes_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x**2 + " + str(f[1]) + "*x**1 + " + str(f[2]) + "\n")
