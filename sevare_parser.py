@@ -4,6 +4,9 @@ import os
 import numpy as np
 from scipy.optimize import curve_fit
 
+import re
+import glob
+
 # SEVARE PARSER 2.0 - adapted to new table forms
 # Format of short datatable:
 #
@@ -78,7 +81,7 @@ def interpolate_inverse(file_, data_sent="nothing"):
     if data_sent == "nothing":
         popt, pcov = curve_fit(lambda t, a, b: a / t + b, x, y)
     else:
-        popt, pcov = curve_fit(lambda t, a, b: (a * data_sent) / t + b, x, y)
+        popt, pcov = curve_fit(lambda t, b: (a * data_sent) / t + b, x, y)
 
     # popt, pcov = curve_fit(lambda t, a, b, c: a * np.exp(b * t) + c, x.reverse(), y)
     # popt, pcov = curve_fit(lambda t, a, b, c: a*t**2 + b*t + c, x, y)
@@ -89,6 +92,7 @@ def interpolate_inverse(file_, data_sent="nothing"):
 
     return np.polyfit(x, y, degree)
     '''
+    # We do not need the estimated covariance of popt
     return popt
 
 
@@ -197,8 +201,6 @@ var_val_array = [None] * len(variable_array)  # used to store changing variables
 index_array = [-1] * len(variable_array)
 datafile_array = [None] * len(variable_array)
 
-
-
 # Get indexes of demanded columns
 for i in range(len(header)):
     # Indexes of variables
@@ -236,11 +238,22 @@ comm_rounds_array = []
 data_sent_array = []
 
 dataset = f.readlines()
+f.close()
 dataset_array = []
 for li in dataset:
     dataset_array.append(li.split(';'))
 
+# get highest input value from summary
+maxinput = -1
+with open(glob.glob(filename + "E*-run-summary.dat")[0], "r") as f:
+    for line in f:
+        match = re.search(r"Inputs.*", line)
+        if match:
+            maxinput = match.group(0).split(" ")[-1]
+            break
+
 # - - - - - - - Parsing for 2D plots - - - - - - - -
+print("Starting 2D plotting.")
 # Go through dataset for each variable
 # print(index_array)
 for i in range(len(index_array)):
@@ -274,9 +287,23 @@ for i in range(len(index_array)):
                     var_val_array[j] = None  # may be inefficient
             # print(protocol + str(var_name_array[i]) + str(var_val_array))
 
+            # We want the maximum set size value in the var_val_array
+            var_val_array[-1] = maxinput
+
             # Fill up metrics arrays
-            comm_rounds_array.append(line[comm_rounds_index])
-            data_sent_array.append(line[data_sent_index])
+            prot_comm_rounds = line[comm_rounds_index]
+            if prot_comm_rounds[0] == "~":
+                prot_comm_rounds = prot_comm_rounds[1:]
+            elif "NA" in prot_comm_rounds:
+                prot_comm_rounds = -1
+            comm_rounds_array.append(float(prot_comm_rounds))
+
+            prot_data_sent = line[data_sent_index]
+            if "NA" in prot_data_sent:
+                prot_data_sent = 0
+            elif prot_data_sent.endswith("\n"):
+                prot_data_sent = prot_data_sent[:-1]
+            data_sent_array.append(float(prot_data_sent))
 
         # Only parse line when it shows the initial values of controlled variables
         if all((var_val_array[j] is None or var_val_array[j] == line[index_array[j]]) for j in range(len(index_array))):
@@ -286,6 +313,7 @@ for i in range(len(index_array)):
 datafile2D.close()
 
 # - - - - - - 3D PLOTTING - - - - - - -
+print("Starting 3D plotting.")
 var_val_array = [None] * len(variable_array)  # reset vars
 plot3D_var_combo = [("Set_", "Lat_"), ("Set_", "Bdw_"), ("Lat_", "Frq_"), ("Bdw_", "Frq_"), ("Lat_", "Bdw_"), ("Lat_", "Pdr_"), ("Bdw_", "Pdr_")]
 
@@ -331,13 +359,16 @@ for combo in plot3D_var_combo:
         if all((var_val_array[i] is None or var_val_array[i] == line[index_array[i]]) for i in range(len(index_array))):
             datafile3D.write(line[index_array[index_0]] + '\t' + line[index_array[index_1]] + '\t' + line[runtime_index] + '\n')
 
+    add_empty_lines(filename + "parsed/3D/" + combo[0] + combo[1] + protocol + ".txt")
 
 # Add empty lines to the data files for latex
-plots3D = os.listdir(filename + "parsed/3D/")
-for plot3D in plots3D:
-    add_empty_lines(filename + "parsed/3D/" + plot3D)
+#plots3D = os.listdir(filename + "parsed/3D/")
+#for plot3D in plots3D:
+#    add_empty_lines(filename + "parsed/3D/" + plot3D)
 
 # ----  INTERPOLATION & WINNER SEARCH for 2D experiments -------
+print("Starting interpolation and winner search.")
+
 # winners is a two dimensional array
 # The first dimension gives the security class: 0 -> mal_dis, 1 -> mal_hon, 2 -> semi_dis, 3 -> semi_hon
 # The second dimension gives the variable (indexes analog to var_name_array) for which the winner is stored
@@ -352,9 +383,7 @@ for i in range(4):
 
 # Get all generated 2D plot files - only files (not directories) were generated in this path
 plots2D = os.listdir(filename + "parsed/2D/")
-# print(plots2D)
 
-print(comm_rounds_array)
 # Interolate generated files
 for i in range(len(plots2D)):
     plot = open(filename + "parsed/2D/" + plots2D[i], "r")
@@ -362,27 +391,18 @@ for i in range(len(plots2D)):
 
     # Reparse protocol name from file name - may be optimisable
     protocol = plots2D[i][4:(len(plots2D[i])-4)]
-    print(protocol)
+    # print("Interpolating " + protocol + "... ")
 
-    prot_comm_rounds = comm_rounds_array[protocols.index(protocol)]
-    if prot_comm_rounds[0] == "~":
-        prot_comm_rounds = prot_comm_rounds[1:]
-    elif prot_comm_rounds == "NA":
-        prot_comm_rounds = -1
-    prot_comm_rounds = float(prot_comm_rounds)
-    print(prot_comm_rounds)
-
-    prot_data_sent = data_sent_array[protocols.index(protocol)]
-    prot_comm_rounds = float(prot_comm_rounds)
+    prot_comm_rounds = comm_rounds_array[protocols.index(protocol)]  # Array contains floats
+    prot_data_sent = data_sent_array[protocols.index(protocol)]  # Array contains floats
 
     if plot_type == "Lat_":
         # f = interpolate_file(plot, 1)
         f = interpolate_file(plot, 1, prot_comm_rounds)  # Using 3rd argument of function
         # var_name index of Lat_ is 0, use var_name_array.index(plots2D[i][0:4]) if changed
-        interpolations_file_2D.write(
-            plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
+        interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
         f[0] = f[0] / prot_comm_rounds
-        info_file.write(plots2D[i] + " -> " + str(f[0]) + "with " + str(prot_comm_rounds) + "\n")
+        info_file.write(plots2D[i] + " -> " + str(f[0]) + " with " + str(prot_comm_rounds) + "\n")
 
     elif plot_type == "Pdr_":
         # f has the form a*e^(b*x) + c
@@ -391,7 +411,7 @@ for i in range(len(plots2D)):
             interpolations_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
-            interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n")
+            interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*e^(" + str(f[1]) + "*x) + " + str(f[2]) + "\n\n")
 
     elif plot_type == "Bdw_":
         # f has the form a/x + b
@@ -401,9 +421,11 @@ for i in range(len(plots2D)):
             continue
         else:
             if f[0] < 0:
-                interpolations_file_2D.write(plots2D[i] + " -> error: preprocessing phase")  # See remark in README.md
+                interpolations_file_2D.write(plots2D[i] + " -> error: preprocessing phase\n")  # See remark in README.md
                 continue
             interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
+            f[0] = f[0] * prot_data_sent    # find correlation
+            info_file.write(plots2D[i] + " -> " + str(f[0]) + " with " + str(prot_data_sent) + "\n\n")
 
     elif plot_type == "Set_":
         continue
@@ -430,6 +452,9 @@ for i in range(len(plots2D)):
     #print(winners[1])
     #print(winners[2])
     #print(winners[3])
+
+    # Wrap up iteration
+    plot.close()
 
 # Write all winners in table
 interpolations_file_2D.write("\n\n\nProtocol Winners:\n\n")
@@ -464,5 +489,6 @@ for j in range(len(winners[i])):
 
 
 # - - - - - - Finish - - - - - -
+datafile3D.close()
 interpolations_file_2D.close()
 info_file.close()
