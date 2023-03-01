@@ -1,0 +1,31 @@
+  Setup:
+    Experiment = 34_matrix_mul 
+    Nodes = meld tinyman yieldly
+    Internal network = 10.10.29.0/24
+    Protocols:
+      Field  = mascot hemi semi temi soho
+      Ring   = 
+      Binary = malicious-rep-bin malicious-ccd ps-rep-bin mal-shamir-bmr shamir-bmr rep-bmr replicated-bin ccd
+    Inputs = 30
+    Compile flags: 
+    Program flags: 
+    Run flags: 
+    Testtypes:
+      LATENCIES	= 0 5 ... 50
+  Summary file = results/2023-02/28_10-47-36/E34-run-summary.dat
+  POS files location = /srv/testbed/results/eiserman/default/2023-02-28_10-47-40_696029
+  Total Experiment runtime = 24h35min9sec
+  Experiment run status: incomplete
+[ ok ]   verified - test passed for mascot
+[ ok ]   verified - test passed for hemi
+[ ok ]   verified - test passed for semi
+[ ok ]   verified - test passed for temi
+[ ok ]   verified - test passed for soho
+  Skip malicious-rep-bin - File not found error: /srv/testbed/results/eiserman/default/2023-02-28_10-47-40_696029/meld/testresultsBINARYmalicious-rep-bin_run06
+  Skip malicious-ccd - File not found error: /srv/testbed/results/eiserman/default/2023-02-28_10-47-40_696029/meld/testresultsBINARYmalicious-ccd_run06
+  Skip ps-rep-bin - File not found error: 
+  Skip mal-shamir-bmr - File not found error: 
+  Skip shamir-bmr - File not found error: 
+  Skip rep-bmr - File not found error: 
+  Skip replicated-bin - File not found error: 
+  Skip ccd - File not found error: 

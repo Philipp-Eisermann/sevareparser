@@ -1,0 +1,29 @@
+Lat_ps-rep-bin.txt -> f(x) = 94.71906452380951*x + 74.36720833333264
+Lat_temi.txt -> f(x) = 7.280269918181818*x + 1.8076183181817982
+Lat_mal-shamir-bmr.txt -> f(x) = 208.05392619047618*x + 624.6579166666643
+Lat_malicious-rep-bin.txt -> f(x) = 87.83196404761901*x + 42.779041666666394
+Lat_hemi.txt -> f(x) = 7.252555045454544*x + 1.945422499999977
+Lat_rep-bmr.txt -> f(x) = 64.36761571428569*x + 95.8599999999999
+Lat_ccd.txt -> f(x) = 87.52729523809522*x + 43.1020833333332
+Lat_replicated-bin.txt -> f(x) = 87.78410309523808*x + 34.57870833333286
+Lat_malicious-ccd.txt -> f(x) = 97.30099690476189*x + 80.485541666666
+Lat_soho.txt -> f(x) = 7.250050545454544*x + 2.381750909090905
+Lat_semi.txt -> f(x) = 7.251962790909089*x + 1.921985954545375
+Lat_shamir-bmr.txt -> f(x) = 127.3598714285714*x + 178.11574999999928
+Lat_mascot.txt -> f(x) = 7.428758363636362*x + 3.315024545454514
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+- mascot was best for Lat_ with a coefficient of: 0.0005106026780972137
+Malicious, Honest Majority protocols:
+- semi was best for Lat_ with a coefficient of: 0.0005031892028107889
+Semi-Honest, Dishonest Majority protocols:
+- mal-shamir-bmr was best for Lat_ with a coefficient of: -208.05392619047618
+Semi-Honest, Honest Majority protocols:
+- shamir-bmr was best for Lat_ with a coefficient of: -127.3598714285714
+
+Winners:
+Lat_:mascot,semi,mal-shamir-bmr,shamir-bmr,

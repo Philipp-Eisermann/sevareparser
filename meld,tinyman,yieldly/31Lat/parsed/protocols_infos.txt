@@ -1,0 +1,13 @@
+Lat_ps-rep-bin.txt -> -0.8939556909090908 with -1.0
+Lat_temi.txt -> 0.0005706285450441205 with 886.0
+Lat_mal-shamir-bmr.txt -> -0.18345303636363633 with -1.0
+Lat_malicious-rep-bin.txt -> -0.8109065454545453 with -1.0
+Lat_hemi.txt -> 0.0005373346985210465 with 879.0
+Lat_rep-bmr.txt -> -0.09993753636363635 with -1.0
+Lat_ccd.txt -> -0.7845323454545454 with -1.0
+Lat_replicated-bin.txt -> -0.7880102909090907 with -1.0
+Lat_malicious-ccd.txt -> -0.7970896999999999 with -1.0
+Lat_soho.txt -> 0.0005511652930690992 with 867.0
+Lat_semi.txt -> 0.0005618800404040402 with 900.0
+Lat_shamir-bmr.txt -> -0.16121079090909085 with -1.0
+Lat_mascot.txt -> 0.0006603230258792302 with 1096.0
