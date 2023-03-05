@@ -2,6 +2,9 @@ import argparse
 import os
 import subprocess
 
+import re
+import glob
+
 colors = ['black', 'blue', 'brown', 'cyan', 'darkgray', 'gray', 'green', 'lightgray', 'lime', 'magenta', 'olive',
           'orange', 'pink', 'purple', 'red', 'teal', 'violet', 'white', 'yellow']
 
@@ -50,17 +53,20 @@ def get_name(prefix_):
     return prefix_
 
 
-def generate_tex_plot(tex_name, exp_prefix, included_protocols):
+def generate_tex_plot(tex_name, exp_prefix, included_protocols, inputs_, nodes_, experiment_):
     """
     Creates a .tex file for a single 2D plot
     :param tex_name: name of the tex file
     :param exp_prefix: prefix (giving the experiment variable(s)) of the datafile
     :param included_protocols: list of protocol names to be included in the plot
+    :param inputs_: from the run-summary file
+    :param nodes_: from the run-summary file
+    :param experiment_: from the run-summary file
     // Path + prefix + included_protocol must point to the txt datafile of the protocol
     """
     path = "/parsed/2D/"
     tex_writer = open(tex_name, "w")
-    tex_writer.write(r'\documentclass[8pt]{beamer}')
+    tex_writer.write("\\documentclass[8pt]{beamer}\n")
 
     tex_writer.write("\\setbeamertemplate{itemize item}{$-$}\n")
     tex_writer.write("\\usepackage{pgf}\n")
@@ -89,10 +95,10 @@ def generate_tex_plot(tex_name, exp_prefix, included_protocols):
     tex_writer.write("        \\end{tikzpicture}\n")
 
     tex_writer.write("        \\begin{itemize}\n")
-    tex_writer.write("            \\item Ref.Problem: Scalable Search\n")
-    tex_writer.write("            \\item Library: MP-Slice - Datatype -d 1\n")
-    tex_writer.write("            \\item Metric: input size - runtime\n")
-    tex_writer.write("            \\item Specs: D-1518(2.2GHz) 32GiB 1Gbits\n")
+    tex_writer.write("            \\item Ref.Problem: " + experiment_ + "\n")
+    tex_writer.write("            \\item Library: MP-SPDZ \n")
+    tex_writer.write("            \\item Inputs: " + inputs_ + "\n")
+    tex_writer.write("            \\item Nodes: " + nodes_ + "\n")
     tex_writer.write("        \\end{itemize}\n")
 
     tex_writer.write("    \\end{figure}\n")
@@ -102,12 +108,15 @@ def generate_tex_plot(tex_name, exp_prefix, included_protocols):
     tex_writer.close()
 
 
-def generate_tex_3Dplot(tex_name, exp_prefix, included_protocol):
+def generate_tex_3Dplot(tex_name, exp_prefix, included_protocol, inputs_, nodes_, experiment_):
     """
         Creates a .tex file for a single 3D plot
         :param tex_name: name of the tex file
         :param exp_prefix: prefix (giving the experiment variable(s)) of the datafile
         :param included_protocol: String name of the protocol to be plotted (can only be one)
+        :param inputs_: from the run-summary file
+        :param nodes_: from the run-summary file
+        :param experiment_: from the run-summary file
         // Path + prefix + included_protocol must point to the txt datafile of the protocol
     """
     var1 = exp_prefix[:4]
@@ -134,10 +143,10 @@ def generate_tex_3Dplot(tex_name, exp_prefix, included_protocol):
     tex_writer.write("        \\end{tikzpicture}\n")
 
     tex_writer.write("        \\begin{itemize}\n")
-    tex_writer.write("            \\item Ref.Problem: Scalable Search\n")
-    tex_writer.write("            \\item Library: MP-Slice - Datatype -d 1\n")
-    tex_writer.write("            \\item Metric: input size - runtime\n")
-    tex_writer.write("            \\item Specs: D-1518(2.2GHz) 32GiB 1Gbits\n")
+    tex_writer.write("            \\item Ref.Problem: " + experiment_ + "\n")
+    tex_writer.write("            \\item Library: MP-SPDZ \n")
+    tex_writer.write("            \\item Inputs: " + inputs_ + "\n")
+    tex_writer.write("            \\item Nodes: " + nodes_ + "\n")
     tex_writer.write("        \\end{itemize}\n")
 
     tex_writer.write("    \\end{figure}\n")
@@ -171,6 +180,27 @@ if "parsed" not in os.listdir(filename):
 # Create directories
 os.mkdir(filename + "plotted/")
 os.mkdir(filename + "plotted/2D")
+
+summary_nodes = "-"
+summary_experiment = "-"
+summary_inputs = "-"
+
+# Parse summary file
+with open(glob.glob(filename + "E*-run-summary.dat")[0], "r") as fi:
+    f = fi.readlines()
+    i = 0
+    while "Experiment" not in f[i]:
+        i += 1
+    print(f[i].split("="))
+    summary_experiment = f[i].split("=")[1].replace("_", " ").strip('\n')
+
+    while "Nodes" not in f[i]:
+        i += 1
+    summary_nodes = f[i].split("=")[1].strip('\n')
+
+    while "Inputs" not in f[i]:
+        i += 1
+    summary_inputs = f[i].split("=")[1].strip('\n')
 
 # - - - - - - - - CREATE 2D PLOTS - - - - - - - - - - -
 
@@ -216,7 +246,7 @@ for prefix in prefixes:
             continue
 
         # Fill up info of this security class
-        generate_tex_plot(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".tex", prefix, protocols[i])
+        generate_tex_plot(filename + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".tex", prefix, protocols[i], summary_inputs, summary_nodes, summary_experiment)
 
         print("- saved: " + "plotted/2D/" + prefix[:len(last) - 1] + "/" + get_security_class_name(i) + ".tex")
 
@@ -235,12 +265,15 @@ else:
     index += 1
     # For each variable, create a cost of security plot
     for i in range(len(info_lines) - index):
+        if ':' not in info_lines[index + i]:
+            continue
+
         exp_variable = info_lines[index + i].split(":")[0]
         winners = info_lines[index + i].split(":")[1].split(",")
 
         winners = [x for x in winners if x != '' and x != '\n']
 
-        generate_tex_plot(filename + "plotted/2D/CostOfSecurity/" + exp_variable + ".tex", exp_variable, winners)
+        generate_tex_plot(filename + "plotted/2D/CostOfSecurity/" + exp_variable + ".tex", exp_variable, winners, summary_inputs, summary_nodes, summary_experiment)
         print("-- saved: " + filename + "plotted/2D/CostOfSecurity/" + exp_variable + ".tex")
 
 for i in range(len(prefixes)):
@@ -274,79 +307,85 @@ prefixes.remove("CostOfSecurity")
 # - - - - - - - - CREATE 3D PLOTS - - - - - - - - - - -
 print("Commencing 3D plotting")
 
-data_names = os.listdir(filename + "parsed/3D/")
+if not os.path.exists(filename + "parsed/3D/"):
+    print("No 3D plotting folder was found in parsed/.")
+else:
+    data_names = os.listdir(filename + "parsed/3D/")
 
-data_names = [x for x in data_names if x != ".DS_Store"]
+    data_names = [x for x in data_names if x != ".DS_Store"]
 
-if len(data_names) == 0:
-    print("No 3D plotting data found, exiting")
-    exit()
+    if len(data_names) == 0:
+        print("No 3D plotting data found, exiting")
+        exit()
 
-os.mkdir(filename + "plotted/3D/")
-prefixes = []
+    os.mkdir(filename + "plotted/3D/")
+    prefixes = []
 
-# look at what variables were used in the experiment
-for data in data_names:
-    # only 3D files -
-    if data == ".DS_Store":
-        continue
-    if last != data[0:8]:
-        last = data[0:8]
-        if last not in prefixes:
-            prefixes += [last]
-            # We want one directory for multiple graphs per variable
-            # Its name should be the prefix without the tailing '_'
-            os.mkdir(filename + "plotted/3D/" + last[:len(last) - 1])
-
-for prefix in prefixes:
-    # Will hold the filenames organized by security class for the prefix of this iteration
-    protocols = [None] * 4
-    for i in range(4):
-        protocols[i] = []
-
-    # sort in the 4 classes
+    # look at what variables were used in the experiment
     for data in data_names:
-        if data[:8] == prefix:
-            protocol_name = data[8:(len(data) - 4)]
-            # print(protocol_name)
-            # print(get_security_class(protocol_name))
-            protocols[get_security_class(protocol_name)] += [protocol_name]
-
-    # create plots
-    for i in range(4):  # for each security class
-        if not protocols[i]:
+        # only 3D files -
+        if data == ".DS_Store":
             continue
+        if last != data[0:8]:
+            last = data[0:8]
+            if last not in prefixes:
+                prefixes += [last]
+                # We want one directory for multiple graphs per variable
+                # Its name should be the prefix without the tailing '_'
+                os.mkdir(filename + "plotted/3D/" + last[:len(last) - 1])
 
-        for protocol in protocols[i]:
+    for prefix in prefixes:
+        # Will hold the filenames organized by security class for the prefix of this iteration
+        protocols = [None] * 4
+        for i in range(4):
+            protocols[i] = []
 
-            generate_tex_3Dplot(filename + "plotted/3D/" + prefix[:len(last) - 1] + "/" + protocol + ".tex", prefix, protocol)
+        # sort in the 4 classes
+        for data in data_names:
+            if data[:8] == prefix:
+                protocol_name = data[8:(len(data) - 4)]
+                # print(protocol_name)
+                # print(get_security_class(protocol_name))
+                protocols[get_security_class(protocol_name)] += [protocol_name]
 
-            # No check if data files contain valid info
-            # No check if data files contain multiple values for each axis
-            # Not automatically putting bdw for ex. on a particular axis
+        # create plots
+        for i in range(4):  # for each security class
+            if not protocols[i]:
+                continue
 
-            # Create a plot for each protocol, sorted in its security class directory
+            for protocol in protocols[i]:
 
-            print("-- saved: " + "plotted/3D/" + prefix[:len(last) - 1] + "/" + protocol + ".pdf")
+                generate_tex_3Dplot(filename + "plotted/3D/" + prefix[:len(last) - 1] + "/" + protocol + ".tex", prefix, protocol, summary_inputs, summary_nodes, summary_experiment)
 
-# Make tex files and remove auxiliary files
-os.chdir(filename + "plotted/3D/")
-for prefix in prefixes:
-    os.chdir(prefix[:len(last) - 1])
-    latex_files = os.listdir()
-    for latex_file in latex_files:
-        if not latex_file.endswith(".tex"):
-            continue
-        # Compile the LaTeX file
-        subprocess.call(["pdflatex", latex_file])
+                # No check if data files contain valid info
+                # No check if data files contain multiple values for each axis
+                # Not automatically putting bdw for ex. on a particular axis
 
-        # Remove auxiliary files
-        aux_files = [f for f in os.listdir() if (f.endswith(".aux") or f.endswith(".snm") or f.endswith(".out") or f.endswith(".log") or f.endswith(".toc") or f.endswith(".nav"))]
-        for f in aux_files:
-            os.remove(f)
+                # Create a plot for each protocol, sorted in its security class directory
 
-    os.chdir("../")
+                print("-- saved: " + "plotted/3D/" + prefix[:len(last) - 1] + "/" + protocol + ".pdf")
 
-os.chdir("../../../")
+    # Make tex files and remove auxiliary files
+    os.chdir(filename + "plotted/3D/")
+    for prefix in prefixes:
+        os.chdir(prefix[:len(last) - 1])
+        latex_files = os.listdir()
+        for latex_file in latex_files:
+            if not latex_file.endswith(".tex"):
+                continue
+            # Compile the LaTeX file
+            subprocess.call(["pdflatex", latex_file])
+
+            # Remove auxiliary files
+            aux_files = [f for f in os.listdir() if (f.endswith(".aux") or f.endswith(".snm") or f.endswith(".out") or f.endswith(".log") or f.endswith(".toc") or f.endswith(".nav"))]
+            for f in aux_files:
+                os.remove(f)
+
+        os.chdir("../")
+
+    os.chdir("../../../")
+
 
 # Change exit() at check if 3D data exists if wanting to extend script!
+
+print("\nPlotting complete.\n")

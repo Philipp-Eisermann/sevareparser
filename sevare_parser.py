@@ -87,8 +87,8 @@ def interpolate_inverse(file_, data_sent="nothing"):
     # popt, pcov = curve_fit(lambda t, a, b, c: a*t**2 + b*t + c, x, y)
 
     '''
-        if data_sent != "nothing":
-            x = [el / data_sent for el in x]
+    if data_sent != "nothing":
+        x = [el / data_sent for el in x]
 
     return np.polyfit(x, y, degree)
     '''
@@ -218,12 +218,14 @@ for i in range(len(header)):
     # Metrics indexes
     elif header[i] == "P0commRounds":
         comm_rounds_index = i
-    elif header[i] == "ALLdataSent(MB)":  # "P0dataSent(MB)"
+    elif header[i] == "P0dataSent(MB)":  # "P0dataSent(MB)" "ALLdataSent(MB)"
         data_sent_index = i
 
 # Uses simple get_sorting function to sort
 # if sorting_index != -1:
 #    dataset_array = sorted(dataset_array, key=get_sorting)
+
+# print(index_array)
 
 if not os.path.exists(filename + "parsed/2D"):
     os.mkdir(filename + "parsed/2D")
@@ -244,22 +246,26 @@ for li in dataset:
     dataset_array.append(li.split(';'))
 
 # get highest input value from summary
+print("Parsing run summary...")
 maxinput = -1
 with open(glob.glob(filename + "E*-run-summary.dat")[0], "r") as f:
     for line in f:
         match = re.search(r"Inputs.*", line)
         if match:
             maxinput = match.group(0).split(" ")[-1]
+            print("Maxinput")
             break
 
 # - - - - - - - Parsing for 2D plots - - - - - - - -
 print("Starting 2D plotting.")
+# print("Data Table is " + len(dataset_array) + " lines long.")
 # Go through dataset for each variable
 # print(index_array)
 for i in range(len(index_array)):
     # Only parse for variables that are measured in the table
     if index_array[i] == -1:
         continue
+    print("Parsing for " + var_name_array[i])
 
     # print(str(i) + " Iteration")
     # If table only contains one protocol
@@ -274,6 +280,7 @@ for i in range(len(index_array)):
         if protocol != line[protocol_index]:
             # Update protocol
             protocol = line[protocol_index]
+            print("- Parsing " + protocol + "...")
             protocols.append(protocol)
 
             # Create 2D file descriptor
@@ -287,6 +294,7 @@ for i in range(len(index_array)):
                     var_val_array[j] = None  # may be inefficient
             # print(protocol + str(var_name_array[i]) + str(var_val_array))
 
+            # print(var_val_array)
             # We want the maximum set size value in the var_val_array
             var_val_array[-1] = maxinput
 
@@ -300,7 +308,7 @@ for i in range(len(index_array)):
 
             prot_data_sent = line[data_sent_index]
             if "NA" in prot_data_sent:
-                prot_data_sent = 0
+                prot_data_sent = -1
             elif prot_data_sent.endswith("\n"):
                 prot_data_sent = prot_data_sent[:-1]
             data_sent_array.append(float(prot_data_sent))
@@ -401,7 +409,8 @@ for i in range(len(plots2D)):
         f = interpolate_file(plot, 1, prot_comm_rounds)  # Using 3rd argument of function
         # var_name index of Lat_ is 0, use var_name_array.index(plots2D[i][0:4]) if changed
         interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
-        f[0] = f[0] / prot_comm_rounds
+        if prot_comm_rounds != 0:
+            f[0] = f[0] / prot_comm_rounds
         info_file.write(plots2D[i] + " -> " + str(f[0]) + " with " + str(prot_comm_rounds) + "\n")
 
     elif plot_type == "Pdr_":
@@ -416,15 +425,23 @@ for i in range(len(plots2D)):
     elif plot_type == "Bdw_":
         # f has the form a/x + b
         f = interpolate_inverse(plot)
+        #f = interpolate_file(plot, 1, prot_data_sent)
         if f[0] == -1:
             interpolations_file_2D.write(plots2D[i] + " -> not enough datapoints.\n")
             continue
         else:
             if f[0] < 0:
                 interpolations_file_2D.write(plots2D[i] + " -> error: preprocessing phase\n")  # See remark in README.md
+                ''' for linear interpoaltion on bdw
+                interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "*x + " + str(f[1]) + "\n")
+                if f[0] != 0:
+                    f[0] = f[0] / prot_data_sent  # find correlation
+                info_file.write(plots2D[i] + " -> " + str(f[0]) + " with " + str(prot_data_sent) + "\n\n") '''
                 continue
             interpolations_file_2D.write(plots2D[i] + " -> f(x) = " + str(f[0]) + "/x + " + str(f[1]) + "\n")
-            f[0] = f[0] * prot_data_sent    # find correlation
+            # TODO:
+            if f[0] != 0 and prot_data_sent != 0:
+                f[0] = f[0] / prot_data_sent    # find correlation
             info_file.write(plots2D[i] + " -> " + str(f[0]) + " with " + str(prot_data_sent) + "\n\n")
 
     elif plot_type == "Set_":
