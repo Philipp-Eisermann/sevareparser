@@ -1,0 +1,14 @@
+Pdr_replicated-bin.txt -> f(x) = 8.615398024976786*e^(0.15377547541180997*x) + -12.941044832451349
+Bdw_replicated-bin.txt -> error: preprocessing phase
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+Semi-Honest, Dishonest Majority protocols:
+Semi-Honest, Honest Majority protocols:
+- replicated-bin was best for Pdr_ with a coefficient of: 8.615398024976786
+
+Winners:
+Pdr_:,,,replicated-bin,

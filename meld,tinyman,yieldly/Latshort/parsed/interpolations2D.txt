@@ -1,0 +1,17 @@
+Lat_temi.txt -> f(x) = 0.5035005714285715*x + 0.5413321428571418
+Lat_hemi.txt -> f(x) = 0.47581523809523824*x + 0.7680146428571445
+Lat_soho.txt -> f(x) = 0.4878909523809525*x + 2.071676071428573
+Lat_semi.txt -> f(x) = 0.5430749523809525*x + 0.5036210714285733
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+- hemi was best for Lat_ with a coefficient of: 0.0005388621042981181
+Semi-Honest, Dishonest Majority protocols:
+Semi-Honest, Honest Majority protocols:
+
+Winners:
+Lat_:,hemi,,,

@@ -1,0 +1,87 @@
+Set_ps-rep-field.txt -> not enough datapoints.
+Bdw_real-bmr.txt -> not enough datapoints.
+Bdw_ccd.txt -> f(x) = 163.16552748236538/x + 2.277449113088664
+Set_mal-shamir-bmr.txt -> not enough datapoints.
+Bdw_malicious-rep-ring.txt -> f(x) = 1.3432281810857754/x + 0.07238939705918665
+Bdw_sy-rep-ring.txt -> f(x) = 2.07438283912465/x + 0.06487762099960359
+Bdw_highgear.txt -> error: preprocessing phaseBdw_soho.txt -> f(x) = 1.9023083261703042/x + 0.10713219881752213
+Bdw_malicious-rep-bin.txt -> f(x) = 112.48431399225025/x + 2.564969729150132
+Bdw_mal-shamir-bmr.txt -> f(x) = 8953.550362960821/x + 9.974568342308103
+Set_brain.txt -> not enough datapoints.
+Bdw_malicious-rep-field.txt -> f(x) = 1.3584894096086177/x + 0.0787246577503474
+Set_temi.txt -> not enough datapoints.
+Bdw_shamir-bmr.txt -> f(x) = 3178.5984300884156/x + 8.940013791404978
+Bdw_semi-bmr.txt -> f(x) = 233163.48289467383/x + 90.54121152324474
+Set_ps-rep-ring.txt -> not enough datapoints.
+Set_lowgear.txt -> not enough datapoints.
+Set_malicious-shamir.txt -> not enough datapoints.
+Set_sy-rep-field.txt -> not enough datapoints.
+Bdw_replicated-field.txt -> f(x) = 1.3563192247798437/x + 0.0773233053432382
+Bdw_semi.txt -> f(x) = 1.7862959344033476/x + 0.11557597275546935
+Bdw_ps-rep-ring.txt -> f(x) = 1.3914773983687811/x + 0.0702713358186952
+Bdw_spdz2k.txt -> f(x) = 515.4381957805219/x + 0.7607821218579389
+Set_hemi.txt -> not enough datapoints.
+Set_malicious-ccd.txt -> not enough datapoints.
+Bdw_atlas.txt -> f(x) = 8.327908006848405/x + 0.18570180111823725
+Set_tinier.txt -> not enough datapoints.
+Set_mascot.txt -> not enough datapoints.
+Set_sy-rep-ring.txt -> not enough datapoints.
+Set_malicious-rep-field.txt -> not enough datapoints.
+Bdw_semi-bin.txt -> f(x) = 338.9657932754475/x + 3.1573818411171577
+Bdw_lowgear.txt -> error: preprocessing phaseSet_shamir-bmr.txt -> not enough datapoints.
+Bdw_semi2k.txt -> f(x) = 1.798608836125915/x + 0.1155608865751352
+Set_chaigear.txt -> not enough datapoints.
+Bdw_shamir.txt -> f(x) = 2.0290792813899445/x + 0.16999016022516167
+Bdw_ps-rep-field.txt -> f(x) = 1.3761102088779071/x + 0.07244411734352749
+Bdw_temi.txt -> f(x) = 1.8187401576882039/x + 0.11156506423994032
+Set_semi2k.txt -> not enough datapoints.
+Set_mal-rep-bmr.txt -> not enough datapoints.
+Set_shamir.txt -> not enough datapoints.
+Bdw_mascot.txt -> f(x) = 257.6457326625202/x + 0.5119183022639547
+Set_semi-bmr.txt -> not enough datapoints.
+Set_highgear.txt -> not enough datapoints.
+Bdw_brain.txt -> f(x) = 1.3662172187897448/x + 0.07058497128848727
+Set_ps-rep-bin.txt -> not enough datapoints.
+Bdw_tinier.txt -> not enough datapoints.
+Set_cowgear.txt -> not enough datapoints.
+Set_spdz2k.txt -> not enough datapoints.
+Set_real-bmr.txt -> not enough datapoints.
+Set_replicated-ring.txt -> not enough datapoints.
+Bdw_sy-rep-field.txt -> f(x) = 1.664725735856877/x + 0.06986673696016904
+Set_soho.txt -> not enough datapoints.
+Bdw_rep-bmr.txt -> f(x) = 1362.3239373911454/x + 5.175556441531456
+Bdw_malicious-shamir.txt -> f(x) = 3.8747078668852324/x + 0.04331229847944791
+Set_replicated-bin.txt -> not enough datapoints.
+Set_malicious-rep-ring.txt -> not enough datapoints.
+Set_replicated-field.txt -> not enough datapoints.
+Set_malicious-rep-bin.txt -> not enough datapoints.
+Bdw_chaigear.txt -> f(x) = 686.7146138986576/x + 8.794150990510902
+Bdw_replicated-bin.txt -> f(x) = 74.35838058946216/x + 2.763993055137465
+Bdw_malicious-ccd.txt -> f(x) = 420.81872570384144/x + 1.8360773226551084
+Set_atlas.txt -> not enough datapoints.
+Set_semi-bin.txt -> not enough datapoints.
+Bdw_hemi.txt -> f(x) = 1.899512088342584/x + 0.10773085037772145
+Set_semi.txt -> not enough datapoints.
+Bdw_mal-rep-bmr.txt -> f(x) = 3201.172191270795/x + 10.028423421701659
+Bdw_cowgear.txt -> f(x) = 49.62870603752123/x + 0.6445964102557205
+Bdw_replicated-ring.txt -> f(x) = 1.3827511254539584/x + 0.0690652944019731
+Set_rep-bmr.txt -> not enough datapoints.
+Set_ccd.txt -> not enough datapoints.
+Bdw_ps-rep-bin.txt -> f(x) = 675.7383805127549/x + 4.657177328886467
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+- cowgear was best for Bdw_ with a coefficient of: 49.62870603752123
+Malicious, Honest Majority protocols:
+- semi was best for Bdw_ with a coefficient of: 1.7862959344033476
+Semi-Honest, Dishonest Majority protocols:
+- malicious-rep-ring was best for Bdw_ with a coefficient of: 1.3432281810857754
+Semi-Honest, Honest Majority protocols:
+- replicated-field was best for Bdw_ with a coefficient of: 1.3563192247798437
+
+Winners:
+Bdw_:cowgear,semi,malicious-rep-ring,replicated-field,
+Set_:

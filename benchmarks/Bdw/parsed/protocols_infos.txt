@@ -1,0 +1,42 @@
+Bdw_ccd.txt -> inf with 0.0
+
+Bdw_malicious-rep-ring.txt -> 3.7225444548656257 with 31.7961
+
+Bdw_sy-rep-ring.txt -> 3.9974458881498127 with 16.4737
+
+Bdw_malicious-rep-bin.txt -> inf with 0.0
+
+Bdw_mal-shamir-bmr.txt -> inf with 0.0
+
+Bdw_malicious-rep-field.txt -> 3.050535223053817 with 63.8308
+
+Bdw_shamir-bmr.txt -> inf with 0.0
+
+Bdw_replicated-field.txt -> 3.74885332946785 with 21.7125
+
+Bdw_ps-rep-ring.txt -> 3.698298099930632 with 30.7523
+
+Bdw_atlas.txt -> 4.805695917537052 with 94.9519
+
+Bdw_shamir.txt -> 3.9290421409954086 with 43.3357
+
+Bdw_ps-rep-field.txt -> 2.9782493878095835 with 52.1725
+
+Bdw_brain.txt -> 3.3298334848277666 with 41.4023
+
+Bdw_sy-rep-field.txt -> 2.857065183922388 with 56.1713
+
+Bdw_rep-bmr.txt -> inf with 0.0
+
+Bdw_malicious-shamir.txt -> 3.099873029497979 with 185.239
+
+Bdw_replicated-bin.txt -> inf with 0.0
+
+Bdw_malicious-ccd.txt -> inf with 0.0
+
+Bdw_mal-rep-bmr.txt -> inf with 0.0
+
+Bdw_replicated-ring.txt -> 15.909647933244218 with 1.43023
+
+Bdw_ps-rep-bin.txt -> inf with 0.0
+

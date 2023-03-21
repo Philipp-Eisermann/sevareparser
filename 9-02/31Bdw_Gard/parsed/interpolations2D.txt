@@ -1,0 +1,29 @@
+Bdw_ccd.txt -> f(x) = 0.9161592012259091/x + 0.044689351671435416
+Bdw_soho.txt -> f(x) = 125.6300313997838/x + 1.0532156347179524
+Bdw_malicious-rep-bin.txt -> f(x) = 7.608381590208859/x + 0.03848968864022817
+Bdw_mal-shamir-bmr.txt -> f(x) = 135.6786646319774/x + 0.1300947606473783
+Bdw_shamir-bmr.txt -> f(x) = 60.303310781004996/x + 0.09459708532997996
+Bdw_semi.txt -> f(x) = 196.39239431319092/x + 0.3754219867103096
+Bdw_temi.txt -> f(x) = 37.65761021750013/x + 0.2580896584971431
+Bdw_mascot.txt -> f(x) = 1412.0851174934862/x + 2.1350683251361473
+Bdw_rep-bmr.txt -> f(x) = 36.932262476665386/x + 0.07370049609697514
+Bdw_replicated-bin.txt -> f(x) = 0.2245897208477873/x + 0.04747735657552941
+Bdw_malicious-ccd.txt -> f(x) = 5.56806304276947/x + 0.026619477071443184
+Bdw_hemi.txt -> f(x) = 24.188872425637307/x + 0.41137670362877937
+Bdw_ps-rep-bin.txt -> f(x) = 541.0057502453478/x + 0.7663269246535435
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+- mascot was best for Bdw_ with a coefficient of: 4.526291029039235
+Malicious, Honest Majority protocols:
+- semi was best for Bdw_ with a coefficient of: 3.961193210711589
+Semi-Honest, Dishonest Majority protocols:
+- mal-shamir-bmr was best for Bdw_ with a coefficient of: 4.01378167250371
+Semi-Honest, Honest Majority protocols:
+- shamir-bmr was best for Bdw_ with a coefficient of: 6.014632886267342
+
+Winners:
+Bdw_:mascot,semi,mal-shamir-bmr,shamir-bmr,

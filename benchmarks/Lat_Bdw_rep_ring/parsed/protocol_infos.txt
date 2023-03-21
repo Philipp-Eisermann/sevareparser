@@ -1,0 +1,2 @@
+Lat_malicious-rep-ring.txt -> 1.2754591035279163e-05
+Lat_replicated-ring.txt -> -0.0021230800046148487

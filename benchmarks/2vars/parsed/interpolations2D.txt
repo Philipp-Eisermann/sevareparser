@@ -1,0 +1,17 @@
+Lat_replicated-bin.txt -> f(x) = -6.090999999999977e-05*x + 0.08566622500000004
+Bdw_replicated-bin.txt -> f(x) = 1.0643484426872976/x + 0.06139318903811699
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+Semi-Honest, Dishonest Majority protocols:
+Semi-Honest, Honest Majority protocols:
+- replicated-bin was best for Lat_ with a coefficient of: 6.090999999999977e-05
+- replicated-bin was best for Bdw_ with a coefficient of: 109.20874642800099
+
+Winners:
+Lat_:,,,replicated-bin,
+Bdw_:,,,replicated-bin,

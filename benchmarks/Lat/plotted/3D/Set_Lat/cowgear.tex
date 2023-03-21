@@ -1,0 +1,24 @@
+\documentclass[8pt]{beamer}\setbeamertemplate{itemize item}{$-$}
+\usepackage{pgf}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\begin{document}
+
+\begin{frame}
+    \begin{figure}
+        \begin{tikzpicture}
+            \begin{axis}[
+                xlabel={Input Size}, ylabel={Latency (ms)}, zlabel={runtime [s]}]
+                \addplot3[surf] table {../../../parsed/3D/Set_Lat_cowgear.txt};
+            \end{axis}
+        \end{tikzpicture}
+        \begin{itemize}
+            \item Ref.Problem: Scalable Search
+            \item Library: MP-Slice - Datatype -d 1
+            \item Metric: input size - runtime
+            \item Specs: D-1518(2.2GHz) 32GiB 1Gbits
+        \end{itemize}
+    \end{figure}
+\end{frame}
+\end{document}

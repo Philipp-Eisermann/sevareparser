@@ -1,0 +1,23 @@
+Lat_cowgear.txt -> 0.0006920087991718429 with 1380.0
+
+Lat_temi.txt -> 0.0005657309791332264 with 890.0
+Lat_ps-rep-ring.txt -> 0.0010319221768707485 with 525.0
+
+Lat_hemi.txt -> 0.0005388621042981181 with 883.0
+Lat_sy-rep-field.txt -> 0.0010635979929161747 with 242.0
+
+Lat_malicious-rep-ring.txt -> 0.0010310931065759638 with 525.0
+Lat_sy-rep-ring.txt -> 0.18420787106548378 with 2.84583
+Lat_ps-rep-field.txt -> 0.0010925281954887215 with 228.0
+
+Lat_replicated-ring.txt -> 0.0010189165927240464 with 322.0
+Lat_lowgear.txt -> -0.008919683402346447 with 1380.0
+
+Lat_malicious-shamir.txt -> 0.0010627378890950324 with 231.0
+Lat_soho.txt -> 0.0005601503471652727 with 871.0
+Lat_brain.txt -> 0.0010200976822587443 with 565.0
+Lat_chaigear.txt -> 0.0002073424543946934 with 1206.0
+Lat_semi.txt -> 0.0006007466287399917 with 904.0
+
+Lat_mascot.txt -> 0.000673401645021645 with 1100.0
+Lat_malicious-rep-field.txt -> 0.0010988675856307437 with 228.0

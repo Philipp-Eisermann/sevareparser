@@ -1,0 +1,19 @@
+Pdr_replicated-ring.txt -> f(x) = 683.7951717997057*e^(0.08285994434347022*x) + -582.2051092994118
+Lat_replicated-ring.txt -> f(x) = 19.724679999999996*x + 55.13700000000008
+Set_replicated-ring.txt -> not enough datapoints.
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+Semi-Honest, Dishonest Majority protocols:
+Semi-Honest, Honest Majority protocols:
+- replicated-ring was best for Lat_ with a coefficient of: 35.439074346904306
+- replicated-ring was best for Pdr_ with a coefficient of: 683.7951717997057
+
+Winners:
+Lat_:,,,replicated-ring,
+Pdr_:,,,replicated-ring,
+Set_:,,,

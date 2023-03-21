@@ -1,0 +1,24 @@
+Bdw_malicious-rep-ring.txt -> f(x) = 116.09445973316822/x + 2.026176505015557
+Lat_malicious-rep-ring.txt -> f(x) = 0.00013902759320274992*x + 3.5343753571428556
+Lat_replicated-ring.txt -> f(x) = -0.0011816638689685324*x + 2.1699117857142864
+Set_replicated-ring.txt -> not enough datapoints.
+Set_malicious-rep-ring.txt -> not enough datapoints.
+Bdw_replicated-ring.txt -> f(x) = 22.608627774488664/x + 1.738816010681253
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+Semi-Honest, Dishonest Majority protocols:
+- malicious-rep-ring was best for Lat_ with a coefficient of: 1.2754591035279163e-05
+- malicious-rep-ring was best for Bdw_ with a coefficient of: 116.09445973316822
+Semi-Honest, Honest Majority protocols:
+- replicated-ring was best for Lat_ with a coefficient of: -0.0021230800046148487
+- replicated-ring was best for Bdw_ with a coefficient of: 22.608627774488664
+
+Winners:
+Lat_:,,malicious-rep-ring,replicated-ring,
+Bdw_:,,malicious-rep-ring,replicated-ring,
+Set_:,,

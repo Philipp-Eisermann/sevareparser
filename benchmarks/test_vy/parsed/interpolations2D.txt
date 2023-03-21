@@ -1,0 +1,21 @@
+Set_malicious-shamir.txt -> f(x) = 0.0001439464285714254*x**2 + -0.00039354999999994975*x**1 + 0.11288891428571408
+Set_yaoO.txt -> f(x) = -5.712321428571436e-06*x**2 + 0.00011690464285714277*x**1 + 0.0014599600000000008
+Set_shamir.txt -> f(x) = 8.643392857142852e-05*x**2 + -0.000605749285714286*x**1 + 0.02517568285714286
+Set_replicated-ring.txt -> f(x) = -0.00014467008928571452*x**2 + 0.0030764387500000013*x**1 + 0.025463212857142845
+Set_yao.txt -> f(x) = 2.95049107142857e-05*x**2 + -0.000360866964285715*x**1 + 0.01668956428571429
+Set_replicated-bin.txt -> f(x) = -4.293794642857182e-05*x**2 + 0.0031726944642857208*x**1 + 0.000956432857142828
+Set_ccd.txt -> f(x) = 1.8909821428571214e-05*x**2 + 0.0025650917857142873*x**1 + 0.0037931971428571258
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+Semi-Honest, Dishonest Majority protocols:
+- yaoO was best for Set_ with a coefficient of: -5.712321428571436e-06
+Semi-Honest, Honest Majority protocols:
+- replicated-ring was best for Set_ with a coefficient of: -0.00014467008928571452
+
+Winners:
+Set_:,,yaoO,replicated-ring,

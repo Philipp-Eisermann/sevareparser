@@ -1,0 +1,29 @@
+\documentclass[8pt]{beamer}
+\setbeamertemplate{itemize item}{$-$}
+\usepackage{pgf}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\begin{document}
+
+\begin{frame}
+    \begin{figure}
+        \begin{tikzpicture}
+            \begin{axis}[
+                xlabel={Latency (ms)}, ylabel={runtime [s]},legend style={anchor=west, legend pos=outer north east}]
+                \addplot[mark=|, color= black,   thick] table {../../..//parsed/2D/Lat_rep-bmr.txt};
+                \addplot[mark=|, color= blue,   thick] table {../../..//parsed/2D/Lat_ccd.txt};
+                \addplot[mark=|, color= brown,   thick] table {../../..//parsed/2D/Lat_replicated-bin.txt};
+                \addplot[mark=|, color= cyan,   thick] table {../../..//parsed/2D/Lat_shamir-bmr.txt};
+                \legend{rep-bmr,ccd,replicated-bin,shamir-bmr,}
+            \end{axis}
+        \end{tikzpicture}
+        \begin{itemize}
+            \item Ref.Problem:  31 scalable search 
+            \item Library: MP-SPDZ 
+            \item Inputs:  30
+            \item Nodes:  meld tinyman yieldly
+        \end{itemize}
+    \end{figure}
+\end{frame}
+\end{document}

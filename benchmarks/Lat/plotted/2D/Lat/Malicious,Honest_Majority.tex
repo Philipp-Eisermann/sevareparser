@@ -1,0 +1,37 @@
+\documentclass[8pt]{beamer}\setbeamertemplate{itemize item}{$-$}
+\usepackage{pgf}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\begin{document}
+
+\begin{frame}
+    \begin{figure}
+        \begin{tikzpicture}
+            \begin{axis}[
+                xlabel={Latency (ms)}, ylabel={runtime [s]},legend style={anchor=west, legend pos=outer north east}]
+                \addplot[mark=|, color= black,   thick] table {../../..//parsed/2D/Lat_ps-rep-bin.txt};
+                \addplot[mark=|, color= blue,   thick] table {../../..//parsed/2D/Lat_ps-rep-ring.txt};
+                \addplot[mark=|, color= brown,   thick] table {../../..//parsed/2D/Lat_mal-shamir-bmr.txt};
+                \addplot[mark=|, color= cyan,   thick] table {../../..//parsed/2D/Lat_malicious-rep-bin.txt};
+                \addplot[mark=|, color= darkgray,   thick] table {../../..//parsed/2D/Lat_sy-rep-field.txt};
+                \addplot[mark=|, color= gray,   thick] table {../../..//parsed/2D/Lat_malicious-rep-ring.txt};
+                \addplot[mark=|, color= green,   thick] table {../../..//parsed/2D/Lat_sy-rep-ring.txt};
+                \addplot[mark=|, color= lightgray,   thick] table {../../..//parsed/2D/Lat_ps-rep-field.txt};
+                \addplot[mark=|, color= lime,   thick] table {../../..//parsed/2D/Lat_mal-rep-bmr.txt};
+                \addplot[mark=|, color= magenta,   thick] table {../../..//parsed/2D/Lat_malicious-ccd.txt};
+                \addplot[mark=|, color= olive,   thick] table {../../..//parsed/2D/Lat_malicious-shamir.txt};
+                \addplot[mark=|, color= orange,   thick] table {../../..//parsed/2D/Lat_brain.txt};
+                \addplot[mark=|, color= pink,   thick] table {../../..//parsed/2D/Lat_malicious-rep-field.txt};
+                \legend{ps-rep-bin,ps-rep-ring,mal-shamir-bmr,malicious-rep-bin,sy-rep-field,malicious-rep-ring,sy-rep-ring,ps-rep-field,mal-rep-bmr,malicious-ccd,malicious-shamir,brain,malicious-rep-field,}
+            \end{axis}
+        \end{tikzpicture}
+        \begin{itemize}
+            \item Ref.Problem: Scalable Search
+            \item Library: MP-Slice - Datatype -d 1
+            \item Metric: input size - runtime
+            \item Specs: D-1518(2.2GHz) 32GiB 1Gbits
+        \end{itemize}
+    \end{figure}
+\end{frame}
+\end{document}

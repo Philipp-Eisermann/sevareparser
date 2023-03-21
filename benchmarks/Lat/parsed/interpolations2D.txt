@@ -1,0 +1,43 @@
+Lat_cowgear.txt -> f(x) = 0.9549721428571432*x + 9.196514285714285
+Lat_highgear.txt -> f(x) = -33.573377619047626*x + 1060.0656714285717
+Lat_ps-rep-bin.txt -> f(x) = 0.9094119523809526*x + 1.6842485714285704
+Lat_temi.txt -> f(x) = 0.5035005714285715*x + 0.5413321428571418
+Lat_ps-rep-ring.txt -> f(x) = 0.541759142857143*x + 0.6943192857142896
+Lat_mal-shamir-bmr.txt -> f(x) = 2.1031190476190473*x + 1.391321428571439
+Lat_malicious-rep-bin.txt -> f(x) = 0.8106649047619049*x + 0.30661214285714333
+Lat_hemi.txt -> f(x) = 0.47581523809523824*x + 0.7680146428571445
+Lat_sy-rep-field.txt -> f(x) = 0.2573907142857143*x + 0.17478392857142758
+Lat_rep-bmr.txt -> f(x) = 2.024831190476191*x + 0.8012107142857159
+Lat_ccd.txt -> f(x) = 0.7841748571428573*x + 0.22480571428571372
+Lat_malicious-rep-ring.txt -> f(x) = 0.541323880952381*x + 0.6903764285714319
+Lat_sy-rep-ring.txt -> f(x) = 0.5242242857142857*x + 0.1519685714285716
+Lat_ps-rep-field.txt -> f(x) = 0.24909642857142852*x + 0.09008535714285967
+Lat_replicated-bin.txt -> f(x) = 0.7868334761904764*x + 0.27030178571428404
+Lat_replicated-ring.txt -> f(x) = 0.3280911428571429*x + 0.11592142857142512
+Lat_lowgear.txt -> f(x) = -12.309163095238098*x + 407.18103214285725
+Lat_mal-rep-bmr.txt -> f(x) = 2.095024523809524*x + 1.0863107142857245
+Lat_malicious-ccd.txt -> f(x) = 0.7990726666666668*x + 0.25408500000000017
+Lat_malicious-shamir.txt -> f(x) = 0.24549245238095246*x + 0.18427357142856948
+Lat_soho.txt -> f(x) = 0.4878909523809525*x + 2.071676071428573
+Lat_brain.txt -> f(x) = 0.5763551904761905*x + 0.8537407142857154
+Lat_chaigear.txt -> f(x) = 0.25005500000000025*x + 45.28375000000002
+Lat_semi.txt -> f(x) = 0.5430749523809525*x + 0.5036210714285733
+Lat_shamir-bmr.txt -> f(x) = 4.001591666666666*x + 1.3708750000000187
+Lat_mascot.txt -> f(x) = 0.7407418095238095*x + 3.2240242857142904
+Lat_malicious-rep-field.txt -> f(x) = 0.25054180952380956*x + 0.13002428571428565
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+- highgear was best for Lat_ with a coefficient of: -0.027838621574666357
+Malicious, Honest Majority protocols:
+- hemi was best for Lat_ with a coefficient of: 0.0005388621042981181
+Semi-Honest, Dishonest Majority protocols:
+- mal-shamir-bmr was best for Lat_ with a coefficient of: -2.1031190476190473
+Semi-Honest, Honest Majority protocols:
+- shamir-bmr was best for Lat_ with a coefficient of: -4.001591666666666
+
+Winners:
+Lat_:highgear,hemi,mal-shamir-bmr,shamir-bmr,

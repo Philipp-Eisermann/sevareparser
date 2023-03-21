@@ -1,0 +1,29 @@
+\documentclass[8pt]{beamer}
+\setbeamertemplate{itemize item}{$-$}
+\usepackage{pgf}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\begin{document}
+
+\begin{frame}
+    \begin{figure}
+        \begin{tikzpicture}
+            \begin{axis}[
+                xlabel={Input Size}, ylabel={runtime [s]},legend style={anchor=west, legend pos=outer north east}]
+                \addplot[mark=|, color= black,   thick] table {../../..//parsed/2D/Set_mal-shamir-bmr.txt};
+                \addplot[mark=|, color= blue,   thick] table {../../..//parsed/2D/Set_malicious-ccd.txt};
+                \addplot[mark=|, color= brown,   thick] table {../../..//parsed/2D/Set_ps-rep-bin.txt};
+                \addplot[mark=|, color= cyan,   thick] table {../../..//parsed/2D/Set_malicious-rep-bin.txt};
+                \legend{mal-shamir-bmr,malicious-ccd,ps-rep-bin,malicious-rep-bin,}
+            \end{axis}
+        \end{tikzpicture}
+        \begin{itemize}
+            \item Ref.Problem:  31 scalable search 
+            \item Library: MP-SPDZ 
+            \item Inputs:  30
+            \item Nodes:  meld tinyman yieldly
+        \end{itemize}
+    \end{figure}
+\end{frame}
+\end{document}

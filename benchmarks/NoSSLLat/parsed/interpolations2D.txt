@@ -1,0 +1,30 @@
+Lat_temi.txt -> f(x) = 31.248704545454544*x + 25.013959090908852
+Lat_ps-rep-ring.txt -> f(x) = 16.817659727272723*x + 2.9384404545453506
+Lat_hemi.txt -> f(x) = 31.038342727272717*x + 32.825568181817935
+Lat_sy-rep-field.txt -> f(x) = 15.20132118181818*x + 3.6402986363634904
+Lat_malicious-rep-ring.txt -> f(x) = 16.822328363636363*x + 3.234527272727105
+Lat_ps-rep-field.txt -> f(x) = 15.297668181818182*x + -0.814340909091045
+Lat_replicated-ring.txt -> f(x) = 16.603981545454545*x + 2.8216349999998958
+Lat_lowgear.txt -> f(x) = 25.456587272727283*x + 535.3182272727266
+Lat_malicious-shamir.txt -> f(x) = 15.086692818181819*x + 2.9981949999999506
+Lat_soho.txt -> f(x) = 30.43660454545454*x + 37.07731363636331
+Lat_brain.txt -> f(x) = 16.846792272727267*x + 3.0512486363635634
+Lat_semi.txt -> f(x) = 34.623789090909085*x + 57.948909090908955
+Lat_mascot.txt -> f(x) = 39.41623636363636*x + 308.03409090909076
+Lat_malicious-rep-field.txt -> f(x) = 15.120448272727272*x + 3.605832272727194
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+- lowgear was best for Lat_ with a coefficient of: 0.00038489525503450735
+Malicious, Honest Majority protocols:
+- soho was best for Lat_ with a coefficient of: 0.0005114965892858505
+Semi-Honest, Dishonest Majority protocols:
+- brain was best for Lat_ with a coefficient of: 0.0010016524331248747
+Semi-Honest, Honest Majority protocols:
+- replicated-ring was best for Lat_ with a coefficient of: 0.0010015672303929633
+
+Winners:
+Lat_:lowgear,soho,brain,replicated-ring,

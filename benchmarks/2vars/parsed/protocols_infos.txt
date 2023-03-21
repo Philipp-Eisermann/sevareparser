@@ -1,0 +1,3 @@
+Lat_replicated-bin.txt -> 6.090999999999977e-05 with -1.0
+Bdw_replicated-bin.txt -> 109.20874642800099 with 0.009746
+

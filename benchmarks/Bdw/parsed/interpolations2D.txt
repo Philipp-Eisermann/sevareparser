@@ -1,0 +1,35 @@
+Bdw_ccd.txt -> f(x) = 59.40564020875192/x + 0.9721138152288094
+Bdw_malicious-rep-ring.txt -> f(x) = 118.36239574135291/x + 1.8811280063081994
+Bdw_sy-rep-ring.txt -> f(x) = 65.85272432761357/x + 1.5615538561103466
+Bdw_malicious-rep-bin.txt -> f(x) = 58.468843692912614/x + 0.9764633286739071
+Bdw_mal-shamir-bmr.txt -> f(x) = 8418.975779464328/x + 10.127876157141728
+Bdw_malicious-rep-field.txt -> f(x) = 194.7181037157036/x + 2.483149581933232
+Bdw_shamir-bmr.txt -> f(x) = 2983.10911656503/x + 4.001101541998907
+Bdw_replicated-field.txt -> f(x) = 81.39697791607068/x + 2.0179967631900273
+Bdw_ps-rep-ring.txt -> f(x) = 113.73117265849679/x + 1.9414881305564025
+Bdw_atlas.txt -> f(x) = 456.3099581923863/x + 3.7497007907000586
+Bdw_shamir.txt -> f(x) = 170.26779150953473/x + 2.041822691135185
+Bdw_ps-rep-field.txt -> f(x) = 155.3827161854955/x + 2.8759574313748693
+Bdw_brain.txt -> f(x) = 137.86276488888464/x + 2.28570819644831
+Bdw_sy-rep-field.txt -> f(x) = 160.48506556565962/x + 4.826975056517237
+Bdw_rep-bmr.txt -> f(x) = 1264.7623469779173/x + 2.390591522140888
+Bdw_malicious-shamir.txt -> f(x) = 574.2173801111761/x + 2.2362062032716756
+Bdw_replicated-bin.txt -> f(x) = 19.056544137762945/x + 1.3229016796061561
+Bdw_malicious-ccd.txt -> f(x) = 310.2304249751184/x + 0.6550386621240626
+Bdw_mal-rep-bmr.txt -> f(x) = 3033.0618584680574/x + 9.290257158491777
+Bdw_replicated-ring.txt -> f(x) = 22.754455763563875/x + 1.685095767138652
+Bdw_ps-rep-bin.txt -> f(x) = 612.1075838956752/x + 3.5176616302385697
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+Malicious, Honest Majority protocols:
+Semi-Honest, Dishonest Majority protocols:
+- sy-rep-field was best for Bdw_ with a coefficient of: 2.857065183922388
+Semi-Honest, Honest Majority protocols:
+- replicated-field was best for Bdw_ with a coefficient of: 3.74885332946785
+
+Winners:
+Bdw_:,,sy-rep-field,replicated-field,
