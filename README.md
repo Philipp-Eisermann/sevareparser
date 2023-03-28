@@ -1,6 +1,6 @@
 Guide:
 
-> Parameter: directory name of a run outputted by sevare bench (https://github.com/vyrovcz/sevarebench)
+> Parameter: directory name of a run outputted by sevare bench (https://github.com/vyrovcz/sevarebench, version 2023/02 *)
 > Run with python3 sevare_parser.py <name of directory>, this will generate a directory /parsed containing all data files and an info file with the interpolations
 > If the /parsed directory already exists, SevareParser will delete nothing but append to all the files it intended to create and write on
 
@@ -25,3 +25,5 @@ Required Packages:
 > SevareParser and SevarePlotter use numpy and scipy, which can be installed using pip:
 sudo apt install python3-pip
 pip3 install -U numpy scipy
+  
+* The software contained in this repo was designed and tested based on the version of sevarebench up to 2023/02.
