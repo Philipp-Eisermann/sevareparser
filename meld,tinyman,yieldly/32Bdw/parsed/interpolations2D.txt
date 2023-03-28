@@ -1,0 +1,29 @@
+Bdw_ccd.txt -> error: preprocessing phase
+Bdw_soho.txt -> f(x) = 0.4489894695667904/x + 0.06741042893964674
+Bdw_malicious-rep-bin.txt -> f(x) = 53.56728835557855/x + 11.719372955544907
+Bdw_mal-shamir-bmr.txt -> f(x) = 8786.395601650149/x + 43.44949161408219
+Bdw_shamir-bmr.txt -> f(x) = 4446.831198924217/x + 46.483986789507064
+Bdw_semi.txt -> f(x) = 0.600082600354663/x + 0.0737437592878012
+Bdw_temi.txt -> error: preprocessing phase
+Bdw_mascot.txt -> f(x) = 492.48124822839355/x + 0.9601313811241919
+Bdw_rep-bmr.txt -> f(x) = 2637.8221433696917/x + 21.34126115744203
+Bdw_replicated-bin.txt -> error: preprocessing phase
+Bdw_malicious-ccd.txt -> f(x) = 191.69576112348372/x + 22.476708621906514
+Bdw_hemi.txt -> f(x) = 0.0907631198199561/x + 0.11590046854834224
+Bdw_ps-rep-bin.txt -> f(x) = 586.5066987512312/x + 21.908503047343828
+
+
+
+Protocol Winners:
+
+Malicious, Dishonest Majority protocols:
+- mascot was best for Bdw_ with a coefficient of: 11.990476599502676
+Malicious, Honest Majority protocols:
+- hemi was best for Bdw_ with a coefficient of: 3.151497215970698
+Semi-Honest, Dishonest Majority protocols:
+- malicious-ccd was best for Bdw_ with a coefficient of: 2.9301287347507454
+Semi-Honest, Honest Majority protocols:
+- shamir-bmr was best for Bdw_ with a coefficient of: 6.586941746123106
+
+Winners:
+Bdw_:mascot,hemi,malicious-ccd,shamir-bmr,

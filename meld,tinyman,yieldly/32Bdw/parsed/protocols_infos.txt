@@ -1,0 +1,20 @@
+Bdw_soho.txt -> 15.589912137735778 with 0.0288
+
+Bdw_malicious-rep-bin.txt -> 5.721888303297708 with 9.36182
+
+Bdw_mal-shamir-bmr.txt -> 3.9887939283947706 with 2202.77
+
+Bdw_shamir-bmr.txt -> 6.586941746123106 with 675.098
+
+Bdw_semi.txt -> 20.836201401203578 with 0.0288
+
+Bdw_mascot.txt -> 11.990476599502676 with 41.0727
+
+Bdw_rep-bmr.txt -> 8.01180330386066 with 329.242
+
+Bdw_malicious-ccd.txt -> 2.9301287347507454 with 65.4223
+
+Bdw_hemi.txt -> 3.151497215970698 with 0.0288
+
+Bdw_ps-rep-bin.txt -> 7.698979240575995 with 76.1798
+
