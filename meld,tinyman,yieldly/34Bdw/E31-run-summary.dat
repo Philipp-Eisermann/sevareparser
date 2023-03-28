@@ -1,0 +1,15 @@
+Setup:
+    Experiment = 34_matrix_mul 
+    Nodes = meld tinyman yieldly
+    Internal network = 10.10.81.0/24
+    Protocols:
+      Field  = mascot hemi semi temi soho
+      Ring   = 
+      Binary = malicious-rep-bin malicious-ccd ps-rep-bin mal-shamir-bmr shamir-bmr rep-bmr replicated-bin ccd
+    Inputs = 30
+    Compile flags: 
+    Program flags: 
+    Run flags: 
+    Testtypes:
+      BANDWIDTHS	= 10 15 ... 100
+  Summary file = results/2023-03/22_23-59-58/E34-run-summary.dat
